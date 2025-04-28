@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AppBar, Box, Button, Grid, IconButton, Toolbar, Typography } from "@mui/material";
+import MenuIcon from '@mui/icons-material/Menu';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +31,6 @@ export default function RootLayout({
       >
         {children}
       </body>
-    </html>
+    </html >
   );
 }
