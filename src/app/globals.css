@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #e6e6e6;
   --foreground: #171717;
 }
 
-/*********************************************
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -20,9 +20,32 @@
   }
 }
 
+@media screen and (min-width: 1024px) {
+
+  /* PC */
+  .sp-only {
+    display: none;
+  }
+
+  .size-normal {
+    font-size: 1.4rem;
+  }
+}
+
+@media screen and (max-width: 1023px) {
+
+  /* SP */
+  .pc-only {
+    display: none;
+  }
+
+  .size-normal {
+    font-size: 1.2rem;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-*/
