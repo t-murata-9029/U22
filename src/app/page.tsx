@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation";
+import { Typography } from "@mui/material";
 
-// ドメイン直接たたかれたら/homeに遷移する
 export default function Home() {
-  redirect("/home");
+  return (
+    <Typography>ここには何もないよ</Typography>
+  );
 }
