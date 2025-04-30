@@ -1,7 +1,9 @@
 'use client'
+
 import { Box } from "@mui/material";
 import Login from "@/features/common/login/components/Login"
 import isPc from "@/utils/IsPc";
+
 /*---運営用のログイン---*/
 export default function page() {
     return (
