@@ -17,7 +17,6 @@ export default function LoginForm() {
             <Link href="./dashbord">
                 <Box sx={{ display: "flex", justifyContent: "center" }}>
                     <Button variant="contained" sx={{ width: "75%" }} >ログイン</Button>
-
                 </Box>
             </Link>
             <Divider />
