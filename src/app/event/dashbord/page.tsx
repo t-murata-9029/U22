@@ -1,0 +1,95 @@
+import { Widgets } from "@mui/icons-material";
+import { Box, Button, Divider, Grid, Paper, Stack, TextField, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText } from "@mui/material";
+import FolderIcon from '@mui/icons-material/Folder';
+import map_img from "@/../public/website_heatmap.png";
+import Image from "next/image";
+import React from "react";
+
+export default function page() {
+
+    function generate() {
+        return [
+            "千葉グルメ屋台",
+            "房総シーフード",
+            "こだわりコーヒー店",
+            "アジアンエスニック",
+            "焼きたてパンの店",
+        ].map((value) =>
+            <ListItem key={value}>
+                <ListItemAvatar>
+                    <Avatar>
+                        <FolderIcon />
+                    </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                    primary={value}
+                />
+            </ListItem>,
+        );
+    }
+
+    return (
+        <>
+            <Box sx={{ px: 2, py: 2 }} component={Paper}>
+                <Typography variant="h5">理工祭さんようこそ</Typography>
+                <Divider />
+                <Box id="discription" sx={{ my: 2 }}>
+                    <Typography variant="subtitle1" >紹介文</Typography>
+                    <TextField slotProps={{
+                        input: {
+                            readOnly: true,
+                        },
+                    }} fullWidth multiline rows={4} size="small" margin="dense" defaultValue="毎年開催される理工祭です。今年もいろいろなイベントがあるのでぜひ楽しみにしていてください！" />
+                    <Box flexDirection="row" justifyContent="flex-end" display="flex">
+                        <Button variant="contained" size="small">変更する</Button>
+                    </Box>
+                </Box>
+                <Grid container spacing={2} sx={{ my: 2 }}>
+                    <Grid size={6}>
+                        <Box id="transaction-board">
+                            <Stack direction="row" sx={{ justifyContent: "space-between", alignContent: "center" }}>
+                                <Typography variant="h5">取引データ</Typography>
+                                <Button variant="outlined" size="medium">詳細</Button>
+                            </Stack>
+                            <Box id="transaction-detail" sx={{ mx: 2 }}>
+                                <Box id="transaction-content" sx={{ my: 1 }}>
+                                    <Typography variant="h6">売上</Typography>
+                                    <Typography variant="h5" sx={{ mx: 2 }}>9,500円</Typography>
+                                </Box>
+                                <Box id="transaction-content" sx={{ my: 1 }}>
+                                    <Typography variant="h6">総決済回数</Typography>
+                                    <Typography variant="h5" sx={{ mx: 2 }}>13回</Typography>
+                                </Box>
+                                <Box id="transaction-content" sx={{ my: 1 }}>
+                                    <Typography variant="h6">平均注文額</Typography>
+                                    <Typography variant="h5" sx={{ mx: 2 }}>730.7円</Typography>
+                                </Box>
+                                <Box id="transaction-content" sx={{ my: 1 }}>
+                                    <Typography variant="h6">人気店</Typography>
+                                    <Typography variant="h5" sx={{ mx: 2 }}>こだわりコーヒー店</Typography>
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Grid>
+                    <Grid size={6}>
+                        <Stack direction="row" sx={{ justifyContent: "space-between", alignContent: "center" }}>
+                            <Typography variant="h5">会場地図</Typography>
+                            <Button variant="outlined" size="medium">詳細</Button>
+                        </Stack>
+                        <Image src={map_img} height={500} width={500} alt="会場地図" />
+                    </Grid>
+                </Grid>
+                <Box sx={{ my: 2 }}>
+                    <Stack direction="row" sx={{ justifyContent: "space-between", alignContent: "center" }}>
+                        <Typography variant="h5">店舗一覧</Typography>
+                        <Button variant="outlined" size="medium">詳細</Button>
+                    </Stack>
+
+                    <List>
+                        {generate()}
+                    </List>
+                </Box>
+            </Box>
+        </>
+    );
+}
