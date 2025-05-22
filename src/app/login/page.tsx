@@ -27,7 +27,7 @@ export default function LoginPage() {
     }
 
     // ログイン成功後：セッションに user.id は保持されている
-    router.push('/dashboard'); // 任意のページへ遷移
+    router.push('/test'); // 任意のページへ遷移
   };
 
   return (

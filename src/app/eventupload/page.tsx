@@ -1,108 +1,93 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
-const EventUploadPage = () => {
-    const [name, setName] = useState('')
-    const [password, setPassword] = useState('')
-    const [description, setDescription] = useState('')
-    const [file, setFile] = useState<File | null>(null)
-    const [uploading, setUploading] = useState(false)
+export default function CreateEventPage() {
+  const supabase = createClient();
+  const router = useRouter();
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFile = e.target.files?.[0]
-        if (selectedFile) {
-            setFile(selectedFile)
-        }
+  const [eventName, setEventName] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+  const fetchUser = async () => {
+    const { data, error } = await supabase.auth.getSession();
+    const user = data?.session?.user;
+
+    if (!user || error) {
+      router.push('/login');
+      return;
     }
 
-    const handleSubmit = async () => {
-        if (!file) {
-            alert('画像ファイルを選択してください')
-            return
-        }
+    setUserId(user.id);
+    setEmail(user.email ?? null);
+  };
 
-        setUploading(true)
-        const filePath = `${Date.now()}-${file.name}`
+  fetchUser();
+}, [router]);
 
-        // ① 画像をストレージにアップロード
-        const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('image-bucket')
-            .upload(filePath, file)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage('');
+    setError('');
 
-        if (uploadError || !uploadData) {
-            console.error('画像アップロードに失敗:', uploadError?.message)
-            setUploading(false)
-            return
-        }
-
-        // ② DBにレコード挿入（id, event_id は Supabase 側で自動生成）
-        const { error: insertError } = await supabase
-            .from('store')
-            .insert([
-                {
-                    
-                    name: name,
-                    password: password,
-                    description: description,
-                    image: uploadData.path, // image カラムにパスを保存
-                },
-            ])
-
-        if (insertError) {
-            console.error('DB登録エラー:', insertError.message)
-            alert('保存に失敗しました')
-        } else {
-            alert('アップロードと保存が完了しました')
-            // フォームの状態をリセット
-            setName('')
-            setPassword('')
-            setDescription('')
-            setFile(null)
-        }
-
-        setUploading(false)
+    if (!userId) {
+      setError('ユーザーが未認証です');
+      return;
     }
 
-    return (
-        <div className="p-4 max-w-md mx-auto">
-            <h1 className="text-xl font-bold mb-4">イベントアップロード</h1>
-            <input
-                type="text"
-                placeholder="店舗名"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="border p-2 w-full mb-2"
-            />
-            <input
-                type="password"
-                placeholder="パスワード"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="border p-2 w-full mb-2"
-            />
-            <textarea
-                placeholder="説明"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="border p-2 w-full mb-2"
-            />
-            <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="mb-2"
-            />
-            <button
-                onClick={handleSubmit}
-                disabled={uploading}
-                className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
-            >
-                {uploading ? 'アップロード中...' : 'アップロードして保存'}
-            </button>
-        </div>
-    )
+    if (!email) {
+      setError('メールアドレスが取得できませんでした');
+      return;
+    }
+
+    if (eventName.trim() === '') {
+      setError('イベント名を入力してください');
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await supabase.from('event').insert({
+      name: eventName,
+      owner_id: userId,
+      email: email,
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      setError(`エラー: ${error.message}`);
+    } else {
+      setMessage('イベントを作成しました！');
+      setEventName('');
+    }
+  };
+
+  return (
+    <div style={{ padding: 20, maxWidth: 500, margin: 'auto' }}>
+      <h1>イベント作成</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="イベント名"
+          value={eventName}
+          onChange={(e) => setEventName(e.target.value)}
+          required
+          style={{ width: '100%', padding: 8, marginBottom: 10 }}
+        />
+        <button type="submit" style={{ padding: 10 }} disabled={isLoading}>
+          {isLoading ? '作成中...' : '作成する'}
+        </button>
+      </form>
+      {message && <p style={{ color: 'green', marginTop: 10 }}>{message}</p>}
+      {error && <p style={{ color: 'red', marginTop: 10 }}>{error}</p>}
+    </div>
+  );
 }
-
-export default EventUploadPage
