@@ -1,14 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation';
+
+
+
 
 const EventUploadPage = () => {
     const [name, setName] = useState('')
+    const router = useRouter();
     const [password, setPassword] = useState('')
     const [description, setDescription] = useState('')
     const [file, setFile] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
+    const [userId, setUserId] = useState<string | null>(null)
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data, error } = await supabase.auth.getUser()
+            const user = data?.user
+
+            if (error || !user) {
+                alert('ログインが必要です')
+                // ログイン画面にリダイレクトする場合は下記も可
+                router.push('/login')
+                return
+            }
+
+            setUserId(user.id)
+        }
+
+        fetchUser()
+    }, [])
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0]
@@ -23,30 +47,35 @@ const EventUploadPage = () => {
             return
         }
 
+        if (!userId) {
+            alert('ユーザー情報を取得できませんでした')
+            return
+        }
+
         setUploading(true)
         const filePath = `${Date.now()}-${file.name}`
 
-        // ① 画像をストレージにアップロード
+        // ① 画像をアップロード
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from('image-bucket')
             .upload(filePath, file)
 
         if (uploadError || !uploadData) {
-            console.error('画像アップロードに失敗:', uploadError?.message)
+            console.error('画像アップロード失敗:', uploadError?.message)
             setUploading(false)
             return
         }
 
-        // ② DBにレコード挿入（id, event_id は Supabase 側で自動生成）
+        // ② データベースに挿入
         const { error: insertError } = await supabase
             .from('store')
             .insert([
                 {
-                    
-                    name: name,
-                    password: password,
-                    description: description,
-                    image: uploadData.path, // image カラムにパスを保存
+                    name,
+                    password,
+                    description,
+                    image: uploadData.path,
+                    owner_id: userId,
                 },
             ])
 
@@ -55,7 +84,6 @@ const EventUploadPage = () => {
             alert('保存に失敗しました')
         } else {
             alert('アップロードと保存が完了しました')
-            // フォームの状態をリセット
             setName('')
             setPassword('')
             setDescription('')

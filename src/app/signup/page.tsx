@@ -27,7 +27,7 @@ export default function SignUpPage() {
     }
 
     // 認証メールが必要ない場合は即ログイン状態になる
-    router.push('/dashboard'); // ログイン後のページへ遷移
+    router.push('/login'); // ログイン後のページへ遷移
   };
 
   return (
