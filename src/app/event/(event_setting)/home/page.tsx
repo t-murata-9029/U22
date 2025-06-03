@@ -1,4 +1,5 @@
 import { Widgets } from "@mui/icons-material";
+<<<<<<< HEAD
 import { Box, Button, Divider, Grid, Paper, Stack, TextField, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText } from "@mui/material";
 import FolderIcon from '@mui/icons-material/Folder';
 import map_img from "@/../public/website_heatmap.png";
@@ -15,12 +16,21 @@ export default function page() {
         );
     }
 
+=======
+import { Box, Button, Divider, Grid, Paper, Stack, TextField, Typography } from "@mui/material";
+
+export default function page() {
+>>>>>>> main
     return (
         <>
             <Box sx={{ px: 2, py: 2 }} component={Paper}>
                 <Typography variant="h5">(イベント名)さんようこそ</Typography>
                 <Divider />
+<<<<<<< HEAD
                 <Box id="discription" sx={{ my: 2 }}>
+=======
+                <Box id="discription" sx={{ my: 1 }}>
+>>>>>>> main
                     <Typography variant="subtitle1" >紹介文</Typography>
                     <TextField slotProps={{
                         input: {
@@ -31,6 +41,7 @@ export default function page() {
                         <Button variant="contained" size="small">変更する</Button>
                     </Box>
                 </Box>
+<<<<<<< HEAD
                 <Grid container spacing={2} sx={{ my: 2 }}>
                     <Grid size={6}>
                         <Box id="transaction-board">
@@ -87,6 +98,17 @@ export default function page() {
                         )}
                     </List>
                 </Box>
+=======
+                <Grid container spacing={2}>
+                    <Grid size={6}>
+                        <Typography>ここに売上表示する</Typography>
+                    </Grid>
+                    <Grid size={6}>
+                        <Typography>ここにまっぷ表示する</Typography>
+                    </Grid>
+                </Grid>
+                <Typography>ここにてんぽ表示する</Typography>
+>>>>>>> main
             </Box>
         </>
     );
