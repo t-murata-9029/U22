@@ -1,4 +1,4 @@
-import Signup from "@/features/routes/Signup/components/Signup";
+import Signup from "@/features/routes/signup/components/Signup";
 import { Box, Paper, TextField, Typography } from "@mui/material";
 
 export default function page() {
