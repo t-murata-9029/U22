@@ -9,13 +9,12 @@ import { supabase } from "@/lib/supabase";
 
 /* sessionを検証するファイル */
 
-export async function sessionValidator() {
-    const router = useRouter();
+export async function sessionValidator(): Promise<boolean> {
     const data = await supabase.auth.getSession()
 
     /* sessionが存在するか確認する */
     if (data.data.session?.access_token == null) {
-        router.push('/user/login')
+        return false;
     }
 
     /* sessionが有効期限内か確認する */
@@ -24,6 +23,7 @@ export async function sessionValidator() {
     // 現在のUNIXタイムスタンプを秒単位に変換
     const current_timestamp_seconds = Math.floor(current_timestamp_ms / 1000);
     if (data.data.session?.expires_at == null || data.data.session?.expires_at < current_timestamp_seconds) {
-        router.push('/user/login')
+        return false;
     }
+    return true;
 }

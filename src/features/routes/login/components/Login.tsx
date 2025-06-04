@@ -11,25 +11,25 @@ export default function LoginForm() {
             <Typography variant="h5" sx={{ display: "flex", justifyContent: "center" }}>ログイン</Typography>
 
             <Form action={login}>
+                <Stack spacing={1}>
+                    <Box sx={{ display: "flex", justifyContent: "center" }}>
 
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <TextField name="email" label="ID" variant="standard" sx={{ width: "75%" }} />
 
-                    <TextField name="email" label="ID" variant="standard" sx={{ width: "75%" }} />
+                    </Box>
 
-                </Box>
+                    <Box sx={{ display: "flex", justifyContent: "center" }}>
 
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <TextField name="password" type="password" label="Password" variant="standard" sx={{ width: "75%" }} />
 
-                    <TextField name="password" type="password" label="Password" variant="standard" sx={{ width: "75%" }} />
+                    </Box>
 
-                </Box>
+                    <Box sx={{ display: "flex", justifyContent: "center" }}>
 
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <Button variant="contained" type="submit" sx={{ width: "75%" }} >ログイン</Button>
 
-                    <Button variant="contained" type="submit" sx={{ width: "75%" }} >ログイン</Button>
-
-                </Box>
-
+                    </Box>
+                </Stack>
             </Form>
 
             <Divider />
