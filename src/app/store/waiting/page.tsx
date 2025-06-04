@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Html5Qrcode } from "html5-qrcode";
+
 
 export default function WaitingPage() {
     const [storeId, setStoreId] = useState<string | null>(null);
@@ -9,6 +11,9 @@ export default function WaitingPage() {
     const [items, setItems] = useState<any[]>([]);
     const [selectedItems, setSelectedItems] = useState<{ [key: string]: number }>({});
     const [callQueues, setCallQueues] = useState<any[]>([]);
+
+    // QRコード読み取り用
+    const [scanning, setScanning] = useState(false);
 
     // store_id を localStorage から取得（初回のみ）
     useEffect(() => {
@@ -116,6 +121,24 @@ export default function WaitingPage() {
         fetchCallQueues(storeId);
     };
 
+    const startScan = () => {
+        setScanning(true);
+        const html5QrCode = new Html5Qrcode("qr-reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 250 },
+            (decodedText) => {
+                setInputUserId(decodedText);
+                setUserId(decodedText);
+                html5QrCode.stop();
+                setScanning(false);
+            },
+            (errorMessage) => {
+                // 読み取りエラー時の処理（無視してOK）
+            }
+        );
+    };
+
     return (
         <main className="p-4">
             <h1 className="text-xl font-bold mb-4">お客様待ち管理</h1>
@@ -124,21 +147,18 @@ export default function WaitingPage() {
 
             {storeId && !userId && (
                 <div className="mb-6">
-                    <label className="block mb-2 font-semibold">お客様のユーザーIDを入力してください：</label>
-                    <input
-                        type="text"
-                        value={inputUserId}
-                        onChange={(e) => setInputUserId(e.target.value)}
-                        className="border px-3 py-2 w-full max-w-sm mb-2"
-                        placeholder="user_id を入力"
-                    />
-                    <button
-                        onClick={() => setUserId(inputUserId.trim())}
-                        disabled={!inputUserId.trim()}
-                        className="bg-blue-600 text-white px-4 py-2 rounded"
-                    >
-                        決定
-                    </button>
+                    <label className="block mb-2 font-semibold">お客様のQRコードをカメラで読み取ってください：</label>
+                    <div className="max-w-xs">
+                        <div id="qr-reader" />
+                        <button
+                            className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
+                            onClick={startScan}
+                            disabled={scanning}
+                        >
+                            {scanning ? "スキャン中..." : "QRコードを読み取る"}
+                        </button>
+                    </div>
+                    <p className="mt-2 text-gray-600">QRコードをカメラにかざしてください。</p>
                 </div>
             )}
 
@@ -186,44 +206,44 @@ export default function WaitingPage() {
                                 {callQueues
                                     .filter((queue) => !queue.is_called)
                                     .map((queue) => (
-                                    <li key={queue.id} className="border p-3 rounded bg-gray-100">
-                                        <p className="font-bold">ユーザーID: {queue.transaction.user_id}</p>
-                                        <ul className="ml-4 list-disc">
-                                            {queue.transaction.details.map((detail: any, i: number) => (
-                                                <li key={i}>
-                                                    {detail.item.name} × {detail.quantity}（¥{detail.item.price * detail.quantity}）
-                                                </li>
-                                            ))}
-                                        </ul>
-                                        <p className="mt-1 font-semibold">合計金額: ¥{queue.transaction.amount}</p>
-                                        <div className="mt-2 flex gap-2">
-                                            <button
-                                                className="bg-green-600 text-white px-3 py-1 rounded"
-                                                onClick={async () => {
-                                                    await supabase
-                                                        .from('call_queue')
-                                                        .update({ is_called: true })
-                                                        .eq('id', queue.id);
-                                                    fetchCallQueues(storeId!);
-                                                }}
-                                            >
-                                                呼び出し
-                                            </button>
-                                            <button
-                                                className="bg-red-600 text-white px-3 py-1 rounded"
-                                                onClick={async () => {
-                                                    await supabase
-                                                        .from('call_queue')
-                                                        .delete()
-                                                        .eq('id', queue.id);
-                                                    fetchCallQueues(storeId!);
-                                                }}
-                                            >
-                                                削除
-                                            </button>
-                                        </div>
-                                    </li>
-                                ))}
+                                        <li key={queue.id} className="border p-3 rounded bg-gray-100">
+                                            <p className="font-bold">ユーザーID: {queue.transaction.user_id}</p>
+                                            <ul className="ml-4 list-disc">
+                                                {queue.transaction.details.map((detail: any, i: number) => (
+                                                    <li key={i}>
+                                                        {detail.item.name} × {detail.quantity}（¥{detail.item.price * detail.quantity}）
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                            <p className="mt-1 font-semibold">合計金額: ¥{queue.transaction.amount}</p>
+                                            <div className="mt-2 flex gap-2">
+                                                <button
+                                                    className="bg-green-600 text-white px-3 py-1 rounded"
+                                                    onClick={async () => {
+                                                        await supabase
+                                                            .from('call_queue')
+                                                            .update({ is_called: true })
+                                                            .eq('id', queue.id);
+                                                        fetchCallQueues(storeId!);
+                                                    }}
+                                                >
+                                                    呼び出し
+                                                </button>
+                                                <button
+                                                    className="bg-red-600 text-white px-3 py-1 rounded"
+                                                    onClick={async () => {
+                                                        await supabase
+                                                            .from('call_queue')
+                                                            .delete()
+                                                            .eq('id', queue.id);
+                                                        fetchCallQueues(storeId!);
+                                                    }}
+                                                >
+                                                    削除
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
                             </ul>
                         )}
                     </div>
@@ -237,32 +257,32 @@ export default function WaitingPage() {
                                 {callQueues
                                     .filter((queue) => queue.is_called)
                                     .map((queue) => (
-                                    <li key={queue.id} className="border p-3 rounded bg-yellow-100">
-                                        <p className="font-bold">ユーザーID: {queue.transaction.user_id}</p>
-                                        <ul className="ml-4 list-disc">
-                                            {queue.transaction.details.map((detail: any, i: number) => (
-                                                <li key={i}>
-                                                    {detail.item.name} × {detail.quantity}（¥{detail.item.price * detail.quantity}）
-                                                </li>
-                                            ))}
-                                        </ul>
-                                        <p className="mt-1 font-semibold">合計金額: ¥{queue.transaction.amount}</p>
-                                        <div className="mt-2 flex gap-2">
-                                            <button
-                                                className="bg-red-600 text-white px-3 py-1 rounded"
-                                                onClick={async () => {
-                                                    await supabase
-                                                        .from('call_queue')
-                                                        .delete()
-                                                        .eq('id', queue.id);
-                                                    fetchCallQueues(storeId!);
-                                                }}
-                                            >
-                                                削除
-                                            </button>
-                                        </div>
-                                    </li>
-                                ))}
+                                        <li key={queue.id} className="border p-3 rounded bg-yellow-100">
+                                            <p className="font-bold">ユーザーID: {queue.transaction.user_id}</p>
+                                            <ul className="ml-4 list-disc">
+                                                {queue.transaction.details.map((detail: any, i: number) => (
+                                                    <li key={i}>
+                                                        {detail.item.name} × {detail.quantity}（¥{detail.item.price * detail.quantity}）
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                            <p className="mt-1 font-semibold">合計金額: ¥{queue.transaction.amount}</p>
+                                            <div className="mt-2 flex gap-2">
+                                                <button
+                                                    className="bg-red-600 text-white px-3 py-1 rounded"
+                                                    onClick={async () => {
+                                                        await supabase
+                                                            .from('call_queue')
+                                                            .delete()
+                                                            .eq('id', queue.id);
+                                                        fetchCallQueues(storeId!);
+                                                    }}
+                                                >
+                                                    削除
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
                             </ul>
                         )}
                     </div>
