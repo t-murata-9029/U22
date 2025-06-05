@@ -1,25 +1,14 @@
 import { supabase } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 
-
-
 export async function login(formData: FormData) {
-
     const email = formData.get('email')?.toString();
-
     const password = formData.get('password')?.toString();
 
-
-
     // 未入力の場合
-
     if (!email || !password) {
-
         throw new Error('メールアドレスもしくはパスワードが未入力です。');
-
     }
-
-
 
     // supabaseにメールアドレスとパスワードを送ってログイン
 
