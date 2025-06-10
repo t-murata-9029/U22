@@ -1,22 +1,33 @@
 'use client';
 import { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';
-import { supabase } from '@/lib/supabase'; // supabaseクライアントをimport
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation';
 
-// 任意のユーザーIDをここで指定
-const FIXED_USER_ID = 'd9481baf-cc51-438d-83f3-dd31ed2e4075';
 
 export default function CustomerQRCodePage() {
+    const supabase = createClient()
     const [userId, setUserId] = useState<string | null>(null);
     const [called, setCalled] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
-        // ローカル保存が不要であれば、直接セット
-        setUserId(FIXED_USER_ID);
+        const fetchUser = async () => {
+            const { data, error } = await supabase.auth.getUser()
+            const user = data?.user
 
-        // または localStorage を使う場合は以下（任意）
-        // localStorage.setItem('user_id', FIXED_USER_ID);
-    }, []);
+            if (error || !user) {
+                alert('ログインが必要です')
+                // ログイン画面にリダイレクトする場合は下記も可
+                router.push('/auth/login')
+                return
+            }
+
+            setUserId(user.id)
+        }
+
+        fetchUser()
+    }, [])
 
     // 呼び出し通知の購読
     useEffect(() => {
