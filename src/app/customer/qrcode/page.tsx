@@ -38,14 +38,26 @@ export default function CustomerQRCodePage() {
             .on(
                 'postgres_changes',
                 {
-                    event: 'UPDATE',
+                    event: '*',
                     schema: 'public',
                     table: 'call_queue',
                 },
                 async (payload) => {
-                    if (payload.new.is_called) {
+                    // 削除時
+                    if (payload.eventType === 'DELETE') {
                         // transaction_idからuser_idを取得して判定
-                        const { data, error } = await supabase
+                        const { data } = await supabase
+                            .from('transaction')
+                            .select('user_id')
+                            .eq('id', payload.old.transaction_id)
+                            .single();
+                        if (data && data.user_id === userId) {
+                            setCalled(false);
+                        }
+                    }
+                    // 呼び出し時
+                    if (payload.eventType === 'UPDATE' && payload.new.is_called) {
+                        const { data } = await supabase
                             .from('transaction')
                             .select('user_id')
                             .eq('id', payload.new.transaction_id)
