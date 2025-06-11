@@ -3,12 +3,16 @@
 import { Box, CircularProgress, Paper, Typography } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { existEvent } from '../endpoint';
+import { existEvent, getEventInfo } from '../endpoint';
+import { EventData } from '@/interfases/event';
+import React from 'react';
+import Link from 'next/link';
 
 /* イベントのトップ画面 */
 export default function () {
-    const [inSession, setInSession] = useState(false);
+    const [event, setEvent] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [eventInfo, setEventInfo] = useState<EventData | null>(null)
 
     const params = useParams()
     console.log(params.event_id)
@@ -19,13 +23,17 @@ export default function () {
                 const eventId = typeof params.event_id === 'string' ? params.event_id : Array.isArray(params.event_id) ? params.event_id[0] : undefined;
                 if (eventId) {
                     const isValid = await existEvent(eventId);
-                    setInSession(isValid);
+                    setEvent(isValid);
+                    // eventの情報を持ってくる
+                    if (isValid) {
+                        setEventInfo(await getEventInfo(eventId));
+                    }
                 } else {
-                    setInSession(false);
+                    setEvent(false);
                 }
             } catch (error) {
                 console.error("Error validating session:", error);
-                setInSession(false);
+                setEvent(false);
             } finally {
                 setIsLoading(false);
             }
@@ -43,14 +51,34 @@ export default function () {
         );
     }
 
-    return inSession ? normalpage : blockpage;
+    const normalpage = (
+        <Box component={Paper} sx={{ p: 3, m: 2 }}>
+            <Typography variant="h5" component="h1">{eventInfo?.name}</Typography>
+            <Box sx={{ px: 1, py: 1 }}>
+                <Typography variant='h6'>概要</Typography>
+                <Typography variant='body1'>{eventInfo?.description || "無し"}</Typography>
+            </Box>
+            <Box sx={{ px: 1, py: 1 }}>
+                <Typography variant='h6'>イベント</Typography>
+                {
+                    eventInfo?.store_list?.map(store => {
+                        return (
+                            <React.Fragment key={store.id}>
+                                <Link href={`./${eventInfo.id}/store/${store.id}`}>
+                                    <Typography>{store?.name}</Typography>
+                                </Link>
+                            </React.Fragment>
+                        );
+                    })
+                }
+            </Box>
+        </Box >
+    );
+
+    return event ? normalpage : blockpage;
 }
 
-const normalpage = (
-    <Box component={Paper} sx={{ p: 3, m: 2 }}>
-        <Typography variant="h5" component="h1">イベントのトップだよ</Typography>
-    </Box>
-);
+
 
 const blockpage = (
     <Box component={Paper} sx={{ p: 3, m: 2 }}>
