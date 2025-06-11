@@ -15,7 +15,6 @@ export default function () {
     const [eventInfo, setEventInfo] = useState<EventData | null>(null)
 
     const params = useParams()
-    console.log(params.event_id)
 
     useEffect(() => {
         const validateEvent = async () => {

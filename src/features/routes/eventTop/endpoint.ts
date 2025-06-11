@@ -30,6 +30,7 @@ export async function getEventInfo(eventId: string): Promise<EventData | null> {
                 image: record.image || '',
                 owner_id: record.owner_id || '',
                 description: record.description || '',
+                item_list: []
             })) : [],
         };
         return eventData;
