@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import styles from './EventDashboard.module.css';
 import Image from 'next/image';
+import { v4 as uuidv4 } from 'uuid'; // 追加: 一意なファイル名生成用
 
 // --- 型定義 ---
 // データベース関数から返されるデータの型
@@ -34,6 +35,9 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // --- データ取得ロジック ---
     // 1. RPC関数を呼び出して基本データを取得するEffect
@@ -49,7 +53,7 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                 });
 
                 if (rpcError) throw new Error(rpcError.message || 'データベース関数の呼び出しに失敗しました。');
-                
+
                 if (data) {
                     setDashboardData(data);
                 } else {
@@ -76,10 +80,51 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                 .storage
                 .from('image-bucket')
                 .getPublicUrl(dashboardData.map_image_filename);
-            
+
             setMapImageUrl(data.publicUrl);
         }
     }, [dashboardData]); // dashboardDataが更新されたら実行
+
+    // 地図画像アップロード処理
+    const handleMapUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        setUploadError(null);
+
+        try {
+            // 一意なファイル名を生成
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${uuidv4()}.${fileExt}`;
+
+            // Supabase Storageへアップロード
+            const { error: uploadError } = await supabase.storage
+                .from('image-bucket')
+                .upload(fileName, file, { upsert: false });
+
+            if (uploadError) throw uploadError;
+
+            // mapテーブルへレコード追加
+            const { error: insertError } = await supabase
+                .from('map')
+                .insert([
+                    {
+                        event_id,
+                        image: fileName,
+                        name: file.name,
+                    },
+                ]);
+
+            if (insertError) throw insertError;
+
+            // 成功時はダッシュボードデータを再取得
+            window.location.reload();
+        } catch (err: any) {
+            setUploadError(err.message || 'アップロードに失敗しました');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     // --- レンダリング前の状態管理 ---
     if (loading) {
@@ -141,7 +186,7 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                     <h2 className={styles.sectionTitle}>紹介文</h2>
                     <p className={styles.description}>{dashboardData.event_description || '紹介文が設定されていません。'}</p>
                 </div>
-                
+
                 {/* 地図カード */}
                 <div className={styles.card}>
                     <h2 className={styles.sectionTitle}>会場地図</h2>
@@ -151,6 +196,26 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                         ) : (
                             <div className={styles.noImage}>地図画像はありません。</div>
                         )}
+                    </div>
+                    {/* アップロードボタンをボタンらしく修正 */}
+                    <div style={{ marginTop: 16 }}>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            ref={fileInputRef}
+                            onChange={handleMapUpload}
+                            disabled={uploading}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                            className={styles.uploadButton} // 必要ならCSSで装飾
+                        >
+                            {uploading ? 'アップロード中...' : '地図画像をアップロード'}
+                        </button>
+                        {uploadError && <p className={styles.error}>{uploadError}</p>}
                     </div>
                 </div>
             </div>

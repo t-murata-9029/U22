@@ -11,8 +11,8 @@ type WaitingPageProps = {
 
 // このページはサーバーコンポーネントです
 export default async function Page({ params }: WaitingPageProps) {
-  // URLのパスから storeid を取得
-  const { storeid } = params;
+  // paramsをawaitしてからstoreidを取得
+  const { storeid } = await params;
 
   // 取得した storeid をクライアントコンポーネントにpropsとして渡す
   return (

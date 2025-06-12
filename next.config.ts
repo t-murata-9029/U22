@@ -1,12 +1,20 @@
-const path = require("path");
-
+import path from "path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  webpack: config => {
-    // Vue と同じように 「@ = src/」,「~ = src/」に設定する。
-    // => モジュールのパス解決とエイリアスを設定している。
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'iikilfcwickwsjpfmsox.supabase.co',
+        port: '',
+        // ▼▼▼ 修正: バケット名を含めて、より正確なパスに修正 ▼▼▼
+        pathname: '/storage/v1/object/public/image-bucket/**',
+      },
+    ],
+  },
+
+  webpack: (config) => {
     config.resolve.alias["@"] = path.resolve(__dirname, "src");
     config.resolve.alias["~"] = path.join(__dirname, "src");
     return config;

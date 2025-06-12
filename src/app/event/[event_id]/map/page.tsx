@@ -20,12 +20,13 @@ type EventMapPageProps = {
     };
 };
 
-export default function Page({ params }: EventMapPageProps) {
+export default async function Page({ params }: { params: { event_id: string } }) {
+    const { event_id } = await params;
+
     const [maps, setMaps] = useState<MapInfo[]>([]);
     const [activeTab, setActiveTab] = useState(0);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const { event_id } = params;
 
     // event_id を元に、関連する地図のリストを取得します
     useEffect(() => {
@@ -81,14 +82,14 @@ export default function Page({ params }: EventMapPageProps) {
             >
                 イベント一覧に戻る
             </button>
-            
+
             {/* タブ表示コンポーネントを呼び出し */}
             <MapTabs
                 maps={maps}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
             />
-            
+
             {/* 地図とピンの管理コンポーネントを呼び出し */}
             {activeMap && (
                 <MapContainer
