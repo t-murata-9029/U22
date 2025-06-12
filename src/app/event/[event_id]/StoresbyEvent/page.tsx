@@ -1,23 +1,23 @@
-// app/EventTest/[eventid]/StoresbyEvent/page.tsx
+// app/EventTest/[event_id]/StoresbyEvent/page.tsx
 import StoreSelectPage from '@/components/StoreSelectPage'; // パスは実際の場所に合わせてください
 
 type PageProps = {
   params: {
-    eventid: string; // ★★★ キー名を 'eventid' (小文字) に修正 ★★★
+    event_id: string; // ★★★ キー名を 'eventid' (小文字) に修正 ★★★
   };
 };
 
 export default async function SitStoreSelectionPage({ params }: PageProps) {
   // params オブジェクトの中身をサーバーコンソールで確認 (より安全な方法で)
   console.log('Page received params keys:', Object.keys(params).join(', '));
-  if (params.eventid) {
-    console.log('Value of params.eventid:', params.eventid);
+  if (params.event_id) {
+    console.log('Value of params.eventid:', params.event_id);
   } else {
     console.log('params.eventid is not defined or falsy.');
   }
 
   // ★★★ 'params.eventId' を 'params.eventid' (小文字) に修正 ★★★
-  const eventIdFromPath = params.eventid;
+  const eventIdFromPath = params.event_id;
 
   if (!eventIdFromPath) {
     // エラーメッセージのデバッグ情報を修正

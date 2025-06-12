@@ -5,10 +5,10 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
 type Props = {
-  eventid: string
+  event_id: string
 }
 
-export default function EventDashboardClient({ eventid}: Props) {
+export default function EventDashboardClient({ event_id}: Props) {
   const [event, setEvent] = useState<any>(null)
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function EventDashboardClient({ eventid}: Props) {
       const { data, error } = await supabase
         .from('event')
         .select('*')
-        .eq('id', eventid)
+        .eq('id', event_id)
         .single()
 
       if (error) {
@@ -28,13 +28,13 @@ export default function EventDashboardClient({ eventid}: Props) {
     }
 
     fetchEvent()
-  }, [eventid])
+  }, [event_id])
 
   if (!event) return <p>読み込み中...</p>
 
   // Store作成用URLを組み立て
-  const storeCreateUrl = `/EventTest/${eventid}/create`
-  const storeDashboardUrl = `/EventTest/${eventid}/StoresbyEvent`
+  const storeCreateUrl = `/event/${event_id}/create`
+  const storeDashboardUrl = `/event/${event_id}/StoresbyEvent`
 
   return (
     <div className="p-4 max-w-xl mx-auto">

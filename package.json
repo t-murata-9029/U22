@@ -13,7 +13,7 @@
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.2.5",
     "@mui/icons-material": "^7.0.2",
-    "@mui/material": "^7.0.2",
+    "@mui/material": "^7.1.1",
     "@mui/styled-engine-sc": "^7.0.2",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
