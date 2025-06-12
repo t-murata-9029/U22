@@ -70,25 +70,23 @@ export default function () {
                         eventInfo?.store_list?.map(store => {
                             return (
                                 <React.Fragment key={store.id}>
-                                    <Card sx={{ maxWidth: 200 }}>
+                                    <Card sx={{ maxWidth: 200 }} >
                                         <Link href={`./${eventInfo.id}/store/${store.id}`}>
-                                            <CardActionArea>
-                                                <CardMedia
-                                                    component="img"
-                                                    height="140"
-                                                    image={store.image != '' ?
-                                                        `https://iikilfcwickwsjpfmsox.supabase.co/storage/v1/object/public/image-bucket//${store.image}`
-                                                        : "https://iikilfcwickwsjpfmsox.supabase.co/storage/v1/object/public/image-bucket//noimage.jpeg"}
-                                                />
-                                                <CardContent>
-                                                    <Typography gutterBottom variant="subtitle1" component="div">
-                                                        {store.name}
-                                                    </Typography>
-                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                                        {store.description}
-                                                    </Typography>
-                                                </CardContent>
-                                            </CardActionArea>
+                                            <CardMedia
+                                                component="img"
+                                                height="140"
+                                                image={store.image != '' ?
+                                                    `https://iikilfcwickwsjpfmsox.supabase.co/storage/v1/object/public/image-bucket//${store.image}`
+                                                    : "https://iikilfcwickwsjpfmsox.supabase.co/storage/v1/object/public/image-bucket//noimage.jpeg"}
+                                            />
+                                            <CardContent>
+                                                <Typography gutterBottom variant="subtitle1" component="div">
+                                                    {store.name}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                    {store.description}
+                                                </Typography>
+                                            </CardContent>
                                         </Link>
                                     </Card>
                                 </React.Fragment>
