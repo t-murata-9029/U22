@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, CircularProgress, Paper, Typography } from '@mui/material';
+import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import React from 'react';
@@ -59,17 +59,37 @@ export default function StoreTop() {
                 <Typography variant='body1'>{storeInfo?.description || "無し"}</Typography>
             </Box>
             <Box sx={{ px: 1, py: 1 }}>
-                <Typography variant='h6'>商品</Typography>
-                {
-                    storeInfo?.item_list?.map(item => {
-                        return (
-                            <React.Fragment key={item.id}>
-                                <Typography>{item?.name}</Typography>
 
-                            </React.Fragment>
-                        );
-                    })
-                }
+                <Typography variant='h6'>商品</Typography>
+                <TableContainer component={Paper} sx={{ maxWidth: 400 }}>
+                    <Table size="small" aria-label="a dense table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>商品名</TableCell>
+                                <TableCell align="right">値段</TableCell>
+                                <TableCell align="right">概要</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {
+                                storeInfo?.item_list?.map(item => {
+                                    return (
+                                        <TableRow
+                                            key={item.id}
+                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                        >
+                                            <TableCell component="th" scope="row">
+                                                {item.name}
+                                            </TableCell>
+                                            <TableCell align="right">{`${item.price}円`}</TableCell>
+                                            <TableCell align="right">{item.description}</TableCell>
+                                        </TableRow>
+                                    );
+                                })
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Box>
         </Box >
     );
