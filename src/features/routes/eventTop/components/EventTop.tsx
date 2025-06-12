@@ -1,12 +1,11 @@
 'use client'
 
-import { Box, CircularProgress, Paper, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, CardContent, CardMedia, CircularProgress, Link, Paper, Typography } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { existEvent, getEventInfo } from '../endpoint';
 import { EventData } from '@/interfases/event';
 import React from 'react';
-import Link from 'next/link';
 
 /* イベントのトップ画面 */
 export default function () {
@@ -58,18 +57,45 @@ export default function () {
                 <Typography variant='body1'>{eventInfo?.description || "無し"}</Typography>
             </Box>
             <Box sx={{ px: 1, py: 1 }}>
-                <Typography variant='h6'>イベント</Typography>
-                {
-                    eventInfo?.store_list?.map(store => {
-                        return (
-                            <React.Fragment key={store.id}>
-                                <Link href={`./${eventInfo.id}/store/${store.id}`}>
-                                    <Typography>{store?.name}</Typography>
-                                </Link>
-                            </React.Fragment>
-                        );
-                    })
-                }
+                <Typography variant='h6'>お店</Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap', // This is key for wrapping items to the next line
+                        gap: '16px',      // Adds space between items
+                        justifyContent: 'left', // Centers items in the row
+                    }}
+                >
+                    {
+                        eventInfo?.store_list?.map(store => {
+                            return (
+                                <React.Fragment key={store.id}>
+                                    <Card sx={{ maxWidth: 200 }}>
+                                        <Link href={`./${eventInfo.id}/store/${store.id}`}>
+                                            <CardActionArea>
+                                                <CardMedia
+                                                    component="img"
+                                                    height="140"
+                                                    image={store.image != '' ?
+                                                        `https://iikilfcwickwsjpfmsox.supabase.co/storage/v1/object/public/image-bucket//${store.image}`
+                                                        : "https://iikilfcwickwsjpfmsox.supabase.co/storage/v1/object/public/image-bucket//noimage.jpeg"}
+                                                />
+                                                <CardContent>
+                                                    <Typography gutterBottom variant="subtitle1" component="div">
+                                                        {store.name}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                        {store.description}
+                                                    </Typography>
+                                                </CardContent>
+                                            </CardActionArea>
+                                        </Link>
+                                    </Card>
+                                </React.Fragment>
+                            );
+                        })
+                    }
+                </Box>
             </Box>
         </Box >
     );
