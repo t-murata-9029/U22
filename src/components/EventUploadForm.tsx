@@ -1,4 +1,4 @@
-// app/EventTest/[eventid]/create/EventUploadForm.tsx
+// app/components/EventUploadForm.tsx
 
 'use client';
 
