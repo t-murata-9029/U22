@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import styles from './EventDashboard.module.css';
 import Image from 'next/image';
+import Link from 'next/link'
+import { v4 as uuidv4 } from 'uuid';
 
 // --- 型定義 ---
 // データベース関数から返されるデータの型
@@ -34,6 +36,83 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
+    const [isCopied, setIsCopied] = useState<boolean>(false);
+    const [copiedKey, setCopiedKey] = useState<string | null>(null);
+    const [uploading, setUploading] = useState<boolean>(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const mapUrl = `/event/${event_id}/map`;
+  // Store作成用URL
+    const storeCreateUrl = `/event/${event_id}/create`;
+  // ストアダッシュボード用URL
+    const storeDashboardUrl = `/event/${event_id}/StoresbyEvent`;
+
+ // ▼▼▼ 追加: 共有URLを生成 ▼▼▼
+    // windowオブジェクトはブラウザ環境でのみ存在するため、コンポーネントのレンダリング中に安全に参照します
+    const shareUrl = typeof window !== 'undefined' 
+        ? `${window.location.origin}/event/${event_id}/map`
+        : '';
+
+    // ▼▼▼ 追加: URLをクリップボードにコピーする関数 ▼▼▼
+const handleCopyUrl = (key: string, urlPath: string) => {
+    // 共有する際はドメイン名を含む完全なURLの方が親切なため、ここで組み立てる
+    const fullUrl = `${window.location.origin}${urlPath}`;
+
+    navigator.clipboard.writeText(fullUrl).then(() => {
+      setCopiedKey(key); // どのURLがコピーされたかを記録
+      // 2秒後にボタンのテキストを元に戻す
+    setTimeout(() => {
+        setCopiedKey(null);
+    }, 2000);
+    }).catch(err => {
+    console.error('URLのコピーに失敗しました:', err);
+    alert('URLのコピーに失敗しました。');
+    });
+};
+
+
+// 地図画像アップロード処理
+const handleMapUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+
+    try {
+        // 一意なファイル名を生成
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+
+        // Supabase Storageへアップロード
+        const { error: uploadError } = await supabase.storage
+            .from('image-bucket')
+            .upload(fileName, file, { upsert: false });
+
+        if (uploadError) throw uploadError;
+
+        // mapテーブルへレコード追加
+        const { error: insertError } = await supabase
+            .from('map')
+            .insert([
+                {
+                    event_id,
+                    image: fileName,
+                    name: file.name,
+                },
+            ]);
+
+        if (insertError) throw insertError;
+
+        // 成功時はダッシュボードデータを再取得
+        window.location.reload();
+    } catch (err: any) {
+        setUploadError(err.message || 'アップロードに失敗しました');
+    } finally {
+        setUploading(false);
+    }
+};
+
 
     // --- データ取得ロジック ---
     // 1. RPC関数を呼び出して基本データを取得するEffect
@@ -142,7 +221,7 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                     <p className={styles.description}>{dashboardData.event_description || '紹介文が設定されていません。'}</p>
                 </div>
                 
-                {/* 地図カード */}
+{/* 地図カード */}
                 <div className={styles.card}>
                     <h2 className={styles.sectionTitle}>会場地図</h2>
                     <div className={styles.mapImageContainer}>
@@ -152,8 +231,87 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                             <div className={styles.noImage}>地図画像はありません。</div>
                         )}
                     </div>
+                    {/* アップロードボタンをボタンらしく修正 */}
+                    <div style={{ marginTop: 16 }}>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            ref={fileInputRef}
+                            onChange={handleMapUpload}
+                            disabled={uploading}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                            className={styles.uploadButton} // 必要ならCSSで装飾
+                        >
+                            {uploading ? 'アップロード中...' : '地図画像をアップロード'}
+                        </button>
+                        {uploadError && <p className={styles.error}>{uploadError}</p>}
+                    </div>
                 </div>
+            
+
+ {/* --- 管理・共有リンク セクション --- */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-3 border-b pb-2">管理・共有リンク</h2>
+          
+          {/* ▼▼▼ 修正: マップURLをシンプルなLinkに変更 ▼▼▼ */}
+          <div className="mb-4">
+            <p className="font-medium">一般公開用マップページ:</p>
+            <Link href={mapUrl} className="text-blue-600 hover:underline break-all">
+              {/* window.location.origin はクライアントサイドでのみ利用可能なため、表示は相対パスに */}
+              {mapUrl}
+            </Link>
+          </div>
+          
+          {/* ▼▼▼ 追加: Store作成ページの共有URLセクション ▼▼▼ */}
+          <div className="mb-4">
+            <label htmlFor="store-create-url" className="block font-medium mb-1">Store作成ページURL:</label>
+            <div className="flex gap-2">
+              <input
+                id="store-create-url"
+                type="text"
+                value={storeCreateUrl}
+                readOnly
+                className="flex-grow bg-gray-100 p-2 border rounded-md focus:outline-none"
+              />
+              <button
+                onClick={() => handleCopyUrl('create', storeCreateUrl)}
+                className={`px-4 py-2 text-white rounded-md transition-colors ${copiedKey === 'create' ? 'bg-green-500' : 'bg-blue-600 hover:bg-blue-700'}`}
+                disabled={copiedKey === 'create'}
+              >
+                {copiedKey === 'create' ? 'コピー完了' : 'コピー'}
+              </button>
+            </div>
+          </div>
+
+          {/* ▼▼▼ 追加: ストアダッシュボードの共有URLセクション ▼▼▼ */}
+          <div>
+            <label htmlFor="store-dashboard-url" className="block font-medium mb-1">ストア一覧ページURL:</label>
+            <div className="flex gap-2">
+              <input
+                id="store-dashboard-url"
+                type="text"
+                value={storeDashboardUrl}
+                readOnly
+                className="flex-grow bg-gray-100 p-2 border rounded-md focus:outline-none"
+              />
+              <button
+                onClick={() => handleCopyUrl('dashboard', storeDashboardUrl)}
+                className={`px-4 py-2 text-white rounded-md transition-colors ${copiedKey === 'dashboard' ? 'bg-green-500' : 'bg-blue-600 hover:bg-blue-700'}`}
+                disabled={copiedKey === 'dashboard'}
+              >
+                {copiedKey === 'dashboard' ? 'コピー完了' : 'コピー'}
+              </button>
+            </div>
+           </div>
+          </div>
+
             </div>
         </div>
     );
 }
+
