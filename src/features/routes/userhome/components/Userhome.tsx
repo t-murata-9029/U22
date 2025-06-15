@@ -2,7 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { sessionValidator } from "@/utils/sessionValidator";
-import { Box, Paper, Typography, CircularProgress, Dialog, DialogTitle, Button } from "@mui/material"; // Import CircularProgress for loading indicator
+import { Box, Paper, Typography, CircularProgress, Dialog, DialogTitle, Button, Link } from "@mui/material"; // Import CircularProgress for loading indicator
 import { useEffect, useState } from "react";
 import QRCode from 'react-qr-code';
 
@@ -20,10 +20,6 @@ function SimpleDialog(props: SimpleDialogProps) {
         onClose();
     };
 
-    const handleListItemClick = () => {
-        onClose();
-    };
-
     return (
         <Dialog onClose={handleClose} open={open}>
             <DialogTitle>QRコード</DialogTitle>
@@ -38,6 +34,7 @@ export default function UserHome() {
     const [inSession, setInSession] = useState(false);
     const [isLoading, setIsLoading] = useState(true); // New state for loading status
     const [userId, setUserId] = useState<string>(""); // State for QR code value
+    const [mail, setMail] = useState<string>("");
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
@@ -57,6 +54,7 @@ export default function UserHome() {
                     const { data } = await supabase.auth.getSession();
                     // You can stringify the session or use a specific property
                     setUserId(JSON.stringify(data.session?.user.id));
+                    setMail(JSON.stringify(data.session?.user.email))
                 }
             } catch (error) {
                 console.error("Error validating session:", error);
@@ -80,8 +78,9 @@ export default function UserHome() {
 
     return inSession ? (
         <Box component={Paper} sx={{ p: 3, m: 2 }}>
-            <Typography variant="h5" component="h1">ログインしてるよ</Typography>
-            
+            <Typography variant="h6" >ようこそ</Typography>
+            <Typography variant="caption">{`${mail}でログインしてます`}</Typography>
+            <br />
             <Button variant="contained" onClick={handleClickOpen}>
                 QRコードを表示
             </Button>
@@ -90,6 +89,8 @@ export default function UserHome() {
                 open={open}
                 onClose={handleClose}
             />
+            <br />
+            <Link href="/event/search">イベント一覧</Link>
         </Box>
     ) :
         blockpage;
