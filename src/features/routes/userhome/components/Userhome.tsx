@@ -9,7 +9,6 @@ import QRCode from 'react-qr-code';
 import { getOwnEvent } from "../endpoint";
 import React from "react";
 
-
 export interface SimpleDialogProps {
     userId: string;
     open: boolean;
