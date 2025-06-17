@@ -1,10 +1,13 @@
 'use client'
 
+import { EventData } from "@/interfases/event";
 import { supabase } from "@/lib/supabase";
 import { sessionValidator } from "@/utils/sessionValidator";
 import { Box, Paper, Typography, CircularProgress, Dialog, DialogTitle, Button, Link } from "@mui/material"; // Import CircularProgress for loading indicator
 import { useEffect, useState } from "react";
 import QRCode from 'react-qr-code';
+import { getOwnEvent } from "../endpoint";
+import React from "react";
 
 
 export interface SimpleDialogProps {
@@ -23,7 +26,7 @@ function SimpleDialog(props: SimpleDialogProps) {
     return (
         <Dialog onClose={handleClose} open={open}>
             <DialogTitle>QRコード</DialogTitle>
-            <Box sx={{mx:2, my:2}}>
+            <Box sx={{ mx: 2, my: 2 }}>
                 <QRCode value={props.userId || "no-session"} />
             </Box>
         </Dialog>
@@ -36,6 +39,7 @@ export default function UserHome() {
     const [userId, setUserId] = useState<string>(""); // State for QR code value
     const [mail, setMail] = useState<string>("");
     const [open, setOpen] = useState(false);
+    const [eventList, setEventList] = useState<EventData[] | null>(null)
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -55,6 +59,7 @@ export default function UserHome() {
                     // You can stringify the session or use a specific property
                     setUserId(JSON.stringify(data.session?.user.id));
                     setMail(JSON.stringify(data.session?.user.email))
+                    setEventList(await getOwnEvent(data.session?.user.id))
                 }
             } catch (error) {
                 console.error("Error validating session:", error);
@@ -91,6 +96,25 @@ export default function UserHome() {
             />
             <br />
             <Link href="/event/search">イベント一覧</Link>
+            <br />
+            <Link href="/event/signup">イベント作成はこちら！</Link>
+            <br />
+            <Box sx={{ my: 1 }}>
+                <Typography>あなたがオーナーのイベント</Typography>
+                <Box sx={{ mx: 1 }}>
+                    {
+                        eventList?.map((record: any) => {
+                            return (
+                                <React.Fragment key={record.id}>
+                                    <Link href={`/event/${record.id}/dashbord`}>
+                                        <Typography>{record.name}</Typography>
+                                    </Link>
+                                </React.Fragment>
+                            );
+                        })
+                    }
+                </Box>
+            </Box>
         </Box>
     ) :
         blockpage;
