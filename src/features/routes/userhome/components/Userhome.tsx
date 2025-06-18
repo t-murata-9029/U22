@@ -6,7 +6,7 @@ import { sessionValidator } from "@/utils/sessionValidator";
 import { Box, Paper, Typography, CircularProgress, Dialog, DialogTitle, Button, Link } from "@mui/material"; // Import CircularProgress for loading indicator
 import { useEffect, useState } from "react";
 import QRCode from 'react-qr-code';
-import { getOwnEvent } from "../endpoint";
+import { getJoinedEvents } from "../endpoint";
 import React from "react";
 
 export interface SimpleDialogProps {
@@ -58,7 +58,7 @@ export default function UserHome() {
                     // You can stringify the session or use a specific property
                     setUserId(JSON.stringify(data.session?.user.id));
                     setMail(JSON.stringify(data.session?.user.email))
-                    setEventList(await getOwnEvent(data.session?.user.id))
+                    setEventList(await getJoinedEvents(data.session?.user.id))
                 }
             } catch (error) {
                 console.error("Error validating session:", error);
@@ -98,22 +98,29 @@ export default function UserHome() {
             <br />
             <Link href="/event/signup">イベント作成はこちら！</Link>
             <br />
-            <Box sx={{ my: 1 }}>
-                <Typography>あなたがオーナーのイベント</Typography>
-                <Box sx={{ mx: 1 }}>
-                    {
-                        eventList?.map((record: any) => {
-                            return (
-                                <React.Fragment key={record.id}>
-                                    <Link href={`/event/${record.id}/dashbord`}>
-                                        <Typography>{record.name}</Typography>
-                                    </Link>
-                                </React.Fragment>
-                            );
-                        })
-                    }
+            {eventList?.length != 0 ?
+                <Box sx={{ my: 1 }}>
+                    <Typography>あなたが所属しているイベント</Typography>
+                    <Box sx={{ mx: 1 }}>
+                        {
+                            eventList?.map((record: any) => {
+                                return (
+                                    <React.Fragment key={record.id}>
+                                        <Link href={`/event/${record.id}/dashbord`}>
+                                            <Typography>{record.name}</Typography>
+                                        </Link>
+                                    </React.Fragment>
+                                );
+                            })
+                        }
+                    </Box>
                 </Box>
-            </Box>
+                : ""
+            }
+            <Typography>待ちのやつ</Typography>
+            <Typography>購入履歴</Typography>
+            <Typography>最近利用したイベント</Typography>
+            <Typography>利用したイベントのオススメ</Typography>
         </Box>
     ) :
         blockpage;

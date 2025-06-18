@@ -1,12 +1,29 @@
 import { EventData } from "@/interfases/event";
+import { StoreData } from "@/interfases/store";
 import { supabase } from "@/lib/supabase";
 
-export async function getOwnEvent(userId: string | undefined): Promise<EventData[] | null> {
-    const { data, error: fetchError } = await supabase.from('event').select('*').eq('owner_id', userId);
+/**
+ * 渡されたuserIdの所属しているイベントを返す
+ * @param userId ユーザーID
+ * @returns EventData[]
+ */
+export async function getJoinedEvents(userId: string | undefined): Promise<EventData[]> {
+    const { data, error } = await supabase
+        .from('event_user_relation') // 参加者テーブル
+        .select(`
+        events (
+          id,
+          name,
+          email,
+          owner_id,
+          description
+        )
+      `) // events テーブルの全カラムを結合して取得
+        .eq('user_id', userId); // 指定された user_id でフィルタリング
 
-    console.log(userId)
+    // 所属してなかった場合
     if (data == null) {
-        return null;
+        return [];
     }
 
     const eventList: EventData[] =
@@ -19,4 +36,25 @@ export async function getOwnEvent(userId: string | undefined): Promise<EventData
         })
         )
     return eventList;
+}
+
+/**
+ * 渡されたuserIdの所属しているストアを返す
+ * @param userId ユーザーID
+ * @returns StoreData[]
+ */
+export async function getJoinedStores(userId: string | undefined): Promise<StoreData[]> {
+    const { data, error } = await supabase
+        .from('event_user_relation') // 参加者テーブル
+        .select(`
+        events (
+          id,
+          name,
+          email,
+          owner_id,
+          description
+        )
+      `) // events テーブルの全カラムを結合して取得
+        .eq('user_id', userId); // 指定された user_id でフィルタリング   
+    return []
 }
