@@ -8,9 +8,7 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-
     const isPc = useMediaQuery("(min-width: 1024px)");
-
     return (
         <Box>
             <Box sx={{ flexGrow: 1 }}>
