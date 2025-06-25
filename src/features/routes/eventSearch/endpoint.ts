@@ -7,19 +7,9 @@ import { supabase } from "@/lib/supabase";
 export async function getAllEvent(): Promise<EventData[] | null> {
     const { data, error } = await supabase.from('event').select('*');
 
-    if(data == null){
+    if (data == null) {
         return null
     }
 
-    const eventList: EventData[] =
-        data.map((record: any) => ({
-            id: record.id || "",
-            name: record.name || "",
-            owner_id: record.owner_id || "",
-            description: record.description || "",
-            store_list: [],
-        })
-    )
-
-    return eventList;
+    return data;
 }
