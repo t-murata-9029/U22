@@ -1,28 +1,24 @@
 import { supabase } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 
-export async function login(formData: FormData) {
+export async function login(formData: FormData): Promise<string> {
     const email = formData.get('email')?.toString();
     const password = formData.get('password')?.toString();
 
     // 未入力の場合
     if (!email || !password) {
-        throw new Error('メールアドレスもしくはパスワードが未入力です。');
+        return 'メールアドレスもしくはパスワードが未入力です。'
     }
 
     // supabaseにメールアドレスとパスワードを送ってログイン
-
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
-
         email: email,
-
         password: password,
-
     })
 
     // ログインに失敗した場合
     if (signInError) {
-        throw new Error('メールアドレスもしくはパスワードに誤りがあります。');
+        return 'メールアドレスもしくはパスワードに誤りがあります。';
     }
 
     // ログイン情報をローカルストレージにセット

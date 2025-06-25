@@ -8,7 +8,7 @@ type Props = {
   event_id: string
 }
 
-export default function EventDashboardClient({ event_id}: Props) {
+export default function EventDashboardClient({ event_id }: Props) {
   const [event, setEvent] = useState<any>(null)
 
   useEffect(() => {

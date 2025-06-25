@@ -1,8 +1,17 @@
-import { Box, Button, Divider, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Divider, Paper, Stack, TextField, Typography } from "@mui/material";
 import Form from "next/form";
 import { login } from "@/features/routes/login/endpoint"
+import { use, useActionState } from "react";
+
 
 export default function LoginForm() {
+    const [message, loginAction] = useActionState(
+        async (message: string, formData: FormData) => {
+            return await login(formData);
+        },
+        ''
+    );
+
 
     return (
 
@@ -10,8 +19,11 @@ export default function LoginForm() {
 
             <Typography variant="h5" sx={{ display: "flex", justifyContent: "center" }}>ログイン</Typography>
 
-            <Form action={login}>
+            <Form action={loginAction}>
                 <Stack spacing={1}>
+                    {message != '' ?
+                        <Alert severity="error">{message}</Alert> : ""
+                    }
                     <Box sx={{ display: "flex", justifyContent: "center" }}>
 
                         <TextField name="email" label="ID" variant="standard" sx={{ width: "75%" }} />
