@@ -26,15 +26,16 @@ export async function getJoinedEvents(userId: string | undefined): Promise<Event
     return [];
   }
 
-  const eventList: EventData[] =
-    data.map((record: any) => ({
-      id: record.id || "",
-      name: record.name || "",
-      owner_id: record.owner_id || "",
-      description: record.description || "",
+
+  const eventList: EventData[] = data.flatMap((record) =>
+    record.events.map((eventItem) => ({
+      id: eventItem.id || "",
+      name: eventItem.name || "",
+      owner_id: eventItem.owner_id || "",
+      description: eventItem.description || "",
       store_list: [],
-    })
-    )
+    }))
+  );
   return eventList;
 }
 
