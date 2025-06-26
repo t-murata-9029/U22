@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { headers } from "next/headers";
 import StoreTop from "@/features/routes/storeTop/components/StoreTop";
 
 type Props = {
@@ -9,7 +8,6 @@ type Props = {
 };
 
 const Page: FC<Props> = async (props) => {
-    const requestUrl = (await headers()).get("x-url");
 
     return (
         <>
