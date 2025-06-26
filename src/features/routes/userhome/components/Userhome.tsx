@@ -103,7 +103,7 @@ export default function UserHome() {
                     <Typography>あなたが所属しているイベント</Typography>
                     <Box sx={{ mx: 1 }}>
                         {
-                            eventList?.map((record: any) => {
+                            eventList?.map((record: EventData) => {
                                 return (
                                     <React.Fragment key={record.id}>
                                         <Link href={`/event/${record.id}/dashbord`}>
