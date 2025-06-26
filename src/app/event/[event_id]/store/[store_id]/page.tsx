@@ -7,7 +7,7 @@ type Props = {
     };
 };
 
-const Page: FC<Props> = async (props) => {
+const Page: FC<Props> = async () => {
 
     return (
         <>

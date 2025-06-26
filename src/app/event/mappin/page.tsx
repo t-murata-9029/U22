@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import { useRouter } from 'next/navigation';
 import MapPinEditPage from '@/components/MapPinEditPage';
 
 // ページが受け取るsearchParamsの型定義
@@ -23,15 +22,15 @@ export default function Page({ searchParams }: MappinPageProps) {
             </main>
         );
     }
-    
+
     // クライアントコンポーネントをSuspenseで囲みます
     return (
         <main className="p-4 md:p-6">
-             <h1 className="text-2xl font-bold mb-4">ピン編集</h1>
+            <h1 className="text-2xl font-bold mb-4">ピン編集</h1>
             <Suspense fallback={<div className="p-8 text-center animate-pulse">編集画面を読み込み中...</div>}>
-                <MapPinEditPage 
-                    mapId={mapId} 
-                    imageUrl={decodeURIComponent(imageUrl)} 
+                <MapPinEditPage
+                    mapId={mapId}
+                    imageUrl={decodeURIComponent(imageUrl)}
                 />
             </Suspense>
         </main>

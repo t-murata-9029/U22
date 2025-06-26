@@ -16,12 +16,16 @@ export default function WaitingPage() {
     // QRコード読み取り用
     const [scanning, setScanning] = useState(false);
 
+    // カスみたいなコード将来消すべき
+    setStoreId("");
+    console.log(inputUserId);
+
     // 商品一覧の取得
     useEffect(() => {
         if (!storeId) return;
         supabase
             .from('item')
-            .select('id, name, price, store_id, image, description') 
+            .select('id, name, price, store_id, image, description')
             .eq('store_id', storeId)
             .then(({ data, error }) => {
                 if (error) {
@@ -34,12 +38,12 @@ export default function WaitingPage() {
         fetchCallQueues(storeId);
     }, [storeId]);
 
-   const fetchCallQueues = async (storeId: string) => {
-    // 関連テーブルのカラムで直接フィルタリングする
-    // `transaction_id` は call_queue テーブルの外部キーカラム名と仮定
-    const { data, error } = await supabase
-        .from('call_queue')
-        .select(`
+    const fetchCallQueues = async (storeId: string) => {
+        // 関連テーブルのカラムで直接フィルタリングする
+        // `transaction_id` は call_queue テーブルの外部キーカラム名と仮定
+        const { data, error } = await supabase
+            .from('call_queue')
+            .select(`
             id,
             is_called,
             transaction:transaction_id (
@@ -56,19 +60,19 @@ export default function WaitingPage() {
                 )
             )
         `)
-        // .eq() を使って、データベース側で絞り込みを行う
-        // 書式: '外部キーカラム名.関連テーブルのカラム名'
-        .eq('transaction_id.store_id', storeId) 
-        .order('id', { ascending: true });
+            // .eq() を使って、データベース側で絞り込みを行う
+            // 書式: '外部キーカラム名.関連テーブルのカラム名'
+            .eq('transaction_id.store_id', storeId)
+            .order('id', { ascending: true });
 
-    if (error) {
-        console.error('呼び出し一覧取得エラー', error);
-        return;
-    }
+        if (error) {
+            console.error('呼び出し一覧取得エラー', error);
+            return;
+        }
 
-    // 既にDBでフィルタ済みなので、JSでのfilter処理は不要になる
-    setCallQueues(data || []);
-};
+        // 既にDBでフィルタ済みなので、JSでのfilter処理は不要になる
+        setCallQueues(data || []);
+    };
 
 
 
@@ -136,7 +140,7 @@ export default function WaitingPage() {
                 html5QrCode.stop().catch(err => console.error("QR Code stop error", err));
                 setScanning(false);
             },
-            (errorMessage) => {
+            () => {
                 // 読み取りエラー時の処理（通常は無視）
             }
         ).catch(err => {
