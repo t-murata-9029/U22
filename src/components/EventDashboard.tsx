@@ -83,9 +83,13 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
             alert('地図のアップロードに成功しました！');
             window.location.reload();
 
-        } catch (err: any) {
-            setUploadError(err.message || 'アップロードに失敗しました');
-            console.error(err);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setUploadError(err.message || 'アップロードに失敗しました');
+                console.error(err);
+            } else {
+                console.log("想定外のエラーだよ")
+            }
         } finally {
             setUploading(false);
         }
