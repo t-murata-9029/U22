@@ -29,7 +29,7 @@ export default function CustomerQRCodePage() {
     const [called, setCalled] = useState(false);
     const router = useRouter();
 
-    // ▼▼▼ 修正: any[] を定義した型 TransactionHistory[] に変更 ▼▼▼
+    
     const [history, setHistory] = useState<TransactionHistory[]>([]);
 
     useEffect(() => {
