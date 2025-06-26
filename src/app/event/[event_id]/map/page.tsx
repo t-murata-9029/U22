@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter,useParams } from 'next/navigation';
 import MapTabs from '@/components/MapTabs';
 import MapContainer from '@/components/MapContainer';
 
@@ -20,12 +20,15 @@ type EventMapPageProps = {
     };
 };
 
-export default function Page({ params }: EventMapPageProps) {
+
+
+export default  function Page() {
     const [maps, setMaps] = useState<MapInfo[]>([]);
     const [activeTab, setActiveTab] = useState(0);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const { event_id } = params;
+    const { event_id } =  useParams<EventMapPageProps['params']>();
+    
 
     // event_id を元に、関連する地図のリストを取得します
     useEffect(() => {

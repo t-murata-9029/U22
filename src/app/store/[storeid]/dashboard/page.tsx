@@ -1,7 +1,7 @@
 // app/store/[storeid]/dashboard/page.tsx
 
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server'; 
+import { createClient } from '@/lib/supabase/server';
 
 // propsの型定義を storeid に合わせます
 type DashboardPageProps = {
@@ -13,7 +13,8 @@ type DashboardPageProps = {
 // ★ ページコンポーネントを async 関数に変更
 export default async function DashboardPage({ params }: DashboardPageProps) {
   // paramsから storeid を取り出します
-  const { storeid } = params;
+  const { storeid } = await params;
+
   const supabase = await createClient();
 
   // ★ URLのstoreidを使って、Supabaseからストア情報を取得
@@ -33,7 +34,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
           ストア情報の取得に失敗しました。指定されたストアが存在しない可能性があります。
         </p>
         <div className="mt-6 text-center">
-            <Link href="/" className="text-blue-500 hover:underline">ホームに戻る</Link>
+          <Link href="/" className="text-blue-500 hover:underline">ホームに戻る</Link>
         </div>
       </main>
     );
@@ -44,7 +45,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       {/* ★ h1にストア名を表示 */}
       <h1 className="text-2xl font-bold mb-4 text-center">{store.name}</h1>
       <p className="text-sm text-center text-gray-500 mb-6">ダッシュボード</p>
-      
+
       <ul className="space-y-3">
         <li>
           {/* リンクのhrefには引き続き storeid を使用 */}

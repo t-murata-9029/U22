@@ -6,11 +6,37 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Html5Qrcode } from "html5-qrcode";
 
+// =================================================================
 // 型定義
+// =================================================================
 type Item = {
   id: string;
   name: string;
   price: number;
+};
+
+type TransactionDetailItem = {
+  name: string;
+  price: number;
+};
+
+type TransactionDetail = {
+  quantity: number;
+  item: TransactionDetailItem;
+};
+
+type Transaction = {
+  id: string;
+  user_id: string;
+  amount: number;
+  store_id: string;
+  details: TransactionDetail[];
+};
+
+type CallQueue = {
+  id: string;
+  is_called: boolean;
+  transaction: Transaction;
 };
 
 // コンポーネントが受け取るpropsの型定義
@@ -18,124 +44,134 @@ interface WaitingManagerProps {
   storeid: string;
 }
 
+// =================================================================
+// コンポーネント本体
+// =================================================================
 export default function WaitingManager({ storeid }: WaitingManagerProps) {
-  // ★ storeId の useState は不要に
-  // const [storeId, setStoreId] = useState<string | null>(null);
+  // --- State ---
   const [userId, setUserId] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItems, setSelectedItems] = useState<{ [key: string]: number }>({});
-  const [callQueues, setCallQueues] = useState<any[]>([]);
+  const [callQueues, setCallQueues] = useState<CallQueue[]>([]);
   const [scanning, setScanning] = useState(false);
   const [html5QrCode, setHtml5QrCode] = useState<Html5Qrcode | null>(null);
 
-  // 呼び出し待ち一覧の取得
-  const fetchCallQueues = useCallback(async (currentStoreId: string) => {
-    if (!currentStoreId) return;
+  // --- データ取得・更新ロジック ---
 
-    // ... (fetchCallQueuesのロジックは変更なし、ただし引数でstoreidを受け取る)
-    const { data, error } = await supabase
-      .from('call_queue')
-      .select(`
-        id, is_called,
-        transaction:transaction_id (
-          id, user_id, amount, store_id,
-          details:transaction_detail (
-            quantity,
-            item:item_id (name, price)
-          )
-        )
-      `)
-      .order('id', { ascending: true });
-
-    // Client-side filter (改善の余地あり: 本来はRPC関数が望ましい)
-    const filtered = (data || []).filter(
-      (queue: any) => queue.transaction && queue.transaction.store_id === currentStoreId
-    );
-
+  const fetchCallQueues = useCallback(async () => {
+    if (!storeid) return;
+    const { data, error } = await supabase.rpc('get_call_queues_by_store', {
+      p_store_id: storeid
+    });
     if (error) {
       console.error('呼び出し一覧取得エラー', error);
+      alert('エラー: 呼び出し一覧の取得に失敗しました。');
       return;
     }
-    setCallQueues(filtered);
-  }, []);
+    setCallQueues(data || []);
+  }, [storeid]);
 
-  // ★ useEffect のロジックを修正
-  useEffect(() => {
-    // storeidがpropsとして渡されていない場合は何もしない
-    if (!storeid) return;
-
-    // 商品一覧の取得
-    supabase
-      .from('item')
-      .select('id, name, price')
-      .eq('store_id', storeid)
-      .then(({ data }) => setItems(data || []));
-
-    // 呼び出し待ち一覧の取得
-    fetchCallQueues(storeid);
-
-  }, [storeid, fetchCallQueues]);
-
-  // 購入登録処理
   const handlePurchase = async () => {
-    // ★ propsのstoreidを使用
     if (!storeid || !userId) return;
-    
-    // ... (handlePurchaseのロジックは、storeId を storeid に置き換える以外はほぼ変更なし)
+
     const total = items.reduce((sum, item) => sum + (selectedItems[item.id] || 0) * item.price, 0);
-    const { data: transaction, error: transError } = await supabase
-        .from('transaction')
-        .insert([{ store_id: storeid, user_id: userId, amount: total }])
-        .select().single();
-    if (transError || !transaction) { alert('購入登録に失敗しました'); return; }
-    
-    const details = Object.entries(selectedItems)
-        .filter(([, qty]) => qty > 0)
-        .map(([itemId, qty]) => ({ transaction_id: transaction.id, item_id: itemId, quantity: qty }));
-    const { error: detailError } = await supabase.from('transaction_detail').insert(details);
-    if (detailError) { alert('商品詳細登録に失敗しました'); return; }
-    
-    const { error: queueError } = await supabase.from('call_queue').insert([{ transaction_id: transaction.id, is_called: false }]);
-    if (queueError) { alert('呼び出しキュー登録に失敗しました'); return; }
+    if (total === 0) {
+      alert('商品が選択されていません。');
+      return;
+    }
+
+    const detailsForRpc = Object.entries(selectedItems)
+      .filter(([, qty]) => qty > 0)
+      .map(([itemId, qty]) => ({ item_id: itemId, quantity: qty }));
+
+    const { error } = await supabase.rpc('handle_new_purchase', {
+      p_store_id: storeid,
+      p_user_id: userId,
+      p_amount: total,
+      p_details: detailsForRpc
+    });
+
+    if (error) {
+      alert('購入登録に失敗しました: ' + error.message);
+      return;
+    }
 
     alert('登録が完了しました！');
     setUserId(null);
     setSelectedItems({});
-    fetchCallQueues(storeid);
+    fetchCallQueues();
   };
   
-  // QRコードスキャンの開始/停止ロジック
-  const startScan = useCallback(() => {
+  const handleCall = async (queueId: string) => {
+    const { error } = await supabase.from('call_queue').update({ is_called: true }).eq('id', queueId);
+    if (error) {
+      alert('呼び出し処理に失敗しました。');
+    } else {
+      fetchCallQueues();
+    }
+  };
+
+  const handleDelete = async (queueId: string) => {
+    if (!confirm('このキューを本当に削除しますか？')) return;
+    const { error } = await supabase.from('call_queue').delete().eq('id', queueId);
+    if (error) {
+      alert('削除処理に失敗しました。');
+    } else {
+      fetchCallQueues();
+    }
+  };
+
+  // --- QRコードスキャンロジック ---
+
+ const startScan = useCallback(() => {
     const qrCodeScanner = new Html5Qrcode("qr-reader");
     setHtml5QrCode(qrCodeScanner);
     setScanning(true);
-    
+
     qrCodeScanner.start(
       { facingMode: "environment" },
       { fps: 10, qrbox: { width: 250, height: 250 } },
       (decodedText) => {
-        setUserId(decodedText);
+        // ★★★★★ 修正点 ★★★★★
+        // 受け取った文字列から全ての二重引用符を削除してサニタイズ
+        const cleanedUserId = decodedText.replace(/"/g, '');
+        setUserId(cleanedUserId);
+        // ★★★★★★★★★★★★★★★
+
         stopScan(qrCodeScanner);
       },
-      (errorMessage) => { /* ignore */ }
+      () => { /* ignore error message */ }
     ).catch(err => console.error("QR Scan Start Error:", err));
-  }, []);
+  }, []); // useCallbackの依存配列は空でOK
 
   const stopScan = (scanner?: Html5Qrcode | null) => {
     const scn = scanner || html5QrCode;
     if (scn && scn.isScanning) {
-      scn.stop().then(() => {
-        setScanning(false);
-      }).catch(err => console.error("QR Scan Stop Error:", err));
+      scn.stop().then(() => setScanning(false)).catch(err => console.error("QR Scan Stop Error:", err));
     }
   };
 
   const resetUser = () => {
     setUserId(null);
     setSelectedItems({});
-  }
+  };
+  
+  // --- 初期化エフェクト ---
 
-  // UI部分
+  useEffect(() => {
+    if (!storeid) return;
+    
+    supabase
+      .from('item')
+      .select('id, name, price')
+      .eq('store_id', storeid)
+      .then(({ data }) => setItems(data || []));
+
+    fetchCallQueues();
+  }, [storeid, fetchCallQueues]);
+
+  // --- レンダリング ---
+  
   return (
     <main className="p-4 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6 text-center">お客様待ち管理</h1>
@@ -166,10 +202,11 @@ export default function WaitingManager({ storeid }: WaitingManagerProps) {
             {items.map((item) => (
               <div key={item.id} className="p-3 border rounded-md bg-white">
                 <p className="font-semibold">{item.name}</p>
-                <p className="text-sm text-gray-600">¥{item.price}</p>
+                <p className="text-sm text-gray-600">¥{item.price.toLocaleString()}</p>
                 <input
                   type="number" min={0}
-                  value={selectedItems[item.id] || 0}
+                  value={selectedItems[item.id] || ''}
+                  placeholder="0"
                   onChange={(e) => setSelectedItems({ ...selectedItems, [item.id]: parseInt(e.target.value) || 0 })}
                   className="mt-2 w-full border px-2 py-1 rounded"
                 />
@@ -193,11 +230,11 @@ export default function WaitingManager({ storeid }: WaitingManagerProps) {
                     <p className="font-bold text-lg">お客様ID: {queue.transaction.user_id}</p>
                     <p className="mt-1 font-semibold">合計: ¥{queue.transaction.amount.toLocaleString()}</p>
                     <ul className="text-sm text-gray-700 mt-2 ml-4 list-disc list-inside">
-                      {queue.transaction.details.map((d: any, i: number) => <li key={i}>{d.item.name} × {d.quantity}</li>)}
+                      {queue.transaction.details.map((d, i) => <li key={i}>{d.item.name} × {d.quantity}</li>)}
                     </ul>
                     <div className="mt-4 flex gap-2">
-                        <button className="w-full bg-green-600 text-white px-3 py-2 rounded-lg" onClick={async () => { await supabase.from('call_queue').update({ is_called: true }).eq('id', queue.id); fetchCallQueues(storeid); }}>呼び出し</button>
-                        <button className="w-full bg-red-600 text-white px-3 py-2 rounded-lg" onClick={async () => { if(confirm('本当に削除しますか？')) { await supabase.from('call_queue').delete().eq('id', queue.id); fetchCallQueues(storeid); }}}>削除</button>
+                      <button className="w-full bg-green-600 text-white px-3 py-2 rounded-lg" onClick={() => handleCall(queue.id)}>呼び出し</button>
+                      <button className="w-full bg-red-600 text-white px-3 py-2 rounded-lg" onClick={() => handleDelete(queue.id)}>削除</button>
                     </div>
                   </li>
                 ))}
@@ -206,14 +243,14 @@ export default function WaitingManager({ storeid }: WaitingManagerProps) {
           </div>
           <div id="called-queue">
             <h3 className="font-semibold text-lg mb-2 text-center text-blue-600">▼ 呼び出し中</h3>
-             {callQueues.filter((q) => q.is_called).length === 0 ? <p className="text-center text-gray-500">呼び出し中はありません。</p> : (
+            {callQueues.filter((q) => q.is_called).length === 0 ? <p className="text-center text-gray-500">呼び出し中はありません。</p> : (
               <ul className="space-y-4">
                 {callQueues.filter((q) => q.is_called).map((queue) => (
                   <li key={queue.id} className="border p-4 rounded-lg bg-yellow-50 shadow opacity-70">
                     <p className="font-bold">お客様ID: {queue.transaction.user_id}</p>
                     <p className="mt-1 font-semibold">合計: ¥{queue.transaction.amount.toLocaleString()}</p>
                     <div className="mt-4">
-                        <button className="w-full bg-gray-500 text-white px-3 py-2 rounded-lg" onClick={async () => { if(confirm('本当に削除しますか？')) { await supabase.from('call_queue').delete().eq('id', queue.id); fetchCallQueues(storeid); }}}>完了（削除）</button>
+                      <button className="w-full bg-gray-500 text-white px-3 py-2 rounded-lg" onClick={() => handleDelete(queue.id)}>完了（削除）</button>
                     </div>
                   </li>
                 ))}
