@@ -36,7 +36,7 @@ export async function updateSession(request: NextRequest) {
     await supabase.auth.getUser();
 
     return response;
-  } catch (_e) {
+  } catch (error) {
     return NextResponse.next({
       request: {
         headers: request.headers,
