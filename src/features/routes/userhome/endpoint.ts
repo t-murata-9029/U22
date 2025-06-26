@@ -26,9 +26,8 @@ export async function getJoinedEvents(userId: string | undefined): Promise<Event
     return [];
   }
 
-
   const eventList: EventData[] = data.flatMap((record) =>
-    record.events.map((eventItem) => ({
+    record.events.map((eventItem: EventData) => ({
       id: eventItem.id || "",
       name: eventItem.name || "",
       owner_id: eventItem.owner_id || "",
