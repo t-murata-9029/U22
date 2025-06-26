@@ -116,9 +116,13 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                         .getPublicUrl(data.map_image_filename);
                     setMapImageUrl(urlData.publicUrl);
                 }
-            } catch (err: any) {
-                setError(err.message);
-                console.error("Failed to fetch dashboard data:", err);
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    setError(err.message);
+                    console.error("Failed to fetch dashboard data:", err);
+                } else {
+                    console.error("想定外のえらーおきたよ")
+                }
             } finally {
                 setLoading(false);
             }
@@ -178,7 +182,7 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                     <h2 className={styles.sectionTitle}>紹介文</h2>
                     <p className={styles.description}>{dashboardData.event_description || '紹介文が設定されていません。'}</p>
                 </div>
-                
+
                 {/* 地図カード */}
                 <div className={styles.card}>
                     <h2 className={styles.sectionTitle}>会場地図</h2>
@@ -210,7 +214,7 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                         {uploadError && <p className={styles.error}>{uploadError}</p>}
                     </div>
                 </div>
-                
+
                 {/* ▼▼▼ 修正: 共有URLセクションをカードとしてグリッド内に配置 ▼▼▼ */}
                 <div className={`${styles.card} ${styles.fullWidth}`}>
                     <h2 className={styles.sectionTitle}>管理・共有リンク</h2>
@@ -234,7 +238,7 @@ export default function EventDashboard({ event_id }: { event_id: string }) {
                         <div className={styles.shareUrlItem}>
                             <label htmlFor="store-dashboard-url">ストア一覧ページURL:</label>
                             <div className={styles.shareUrlInputWrapper}>
-                                <input id="store-dashboard-url" type="text" value={storeDashboardUrl} readOnly className={styles.shareUrlInput}/>
+                                <input id="store-dashboard-url" type="text" value={storeDashboardUrl} readOnly className={styles.shareUrlInput} />
                                 <button onClick={() => handleCopyUrl('dashboard', storeDashboardUrl)} className={styles.shareUrlButton} disabled={copiedKey === 'dashboard'}>
                                     {copiedKey === 'dashboard' ? 'コピー完了' : 'コピー'}
                                 </button>
