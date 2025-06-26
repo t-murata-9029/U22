@@ -1,6 +1,13 @@
+
+import globals from "globals"; // これが正しくインポートされているか確認
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
+import pluginJs from "@eslint/js";
+import tseslint from "typescript-eslint";
+import pluginReactConfig from "eslint-plugin-react/configs/recommended.js";
+import { fixupConfigAsPlugin } from "@eslint/compat";
+import nextPlugin from "@next/eslint-plugin-next";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
