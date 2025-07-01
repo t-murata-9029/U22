@@ -1,17 +1,14 @@
 import { Suspense } from 'react';
 import EventDashboard from '@/components/EventDashboard'; // 先ほど作成したクライアントコンポーネントをインポート
-
-// ページのpropsの型
-type DashboardPageProps = {
-    params: {
-        event_id: string;
-    };
-};
+import { useParams } from 'next/navigation';
 
 // このファイルからは 'use client'; を削除します
-export default function Page({ params }: DashboardPageProps) {
-    const awaitedParams = params;
-    const { event_id } = awaitedParams;
+export default function Page() {
+    const params = useParams();
+    let event_id = "";
+    if (typeof params.event_id === 'string') {
+        event_id = params.event_id;
+    }
 
     return (
         // Suspenseは、クライアントコンポーネントの読み込み中にフォールバックUIを表示するために使用します
