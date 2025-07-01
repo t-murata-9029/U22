@@ -1,5 +1,4 @@
-// app/store/[storeid]/sales/page.tsx
-
+'use client'
 import SalesHistory from '@/components/SalesHistory';
 
 // このページが受け取るURLパラメータの型を定義
@@ -7,10 +6,10 @@ import { useParams } from 'next/navigation';
 
 
 // このページはサーバーコンポーネントです
-export default async function Page( ){
-const params = useParams();
+export default async function Page() {
+  const params = useParams();
   let storeid = '';
-  if(params.storeid === 'string') {
+  if (params.storeid === 'string') {
     storeid = params.storeid;
   }
 

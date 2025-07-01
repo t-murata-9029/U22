@@ -1,5 +1,4 @@
-// app/store/[storeid]/summary/page.tsx
-
+'use client'
 import SalesSummary from '@/components/SalesSummary';
 
 import { useParams } from 'next/navigation';
@@ -9,7 +8,7 @@ import { useParams } from 'next/navigation';
 export default async function Page() {
   const params = useParams();
   let storeid = '';
-  if(params.storeid === 'string') {
+  if (params.storeid === 'string') {
     storeid = params.storeid;
   }
 

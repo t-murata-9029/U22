@@ -1,4 +1,4 @@
-// app/store/[storeid]/dashboard/page.tsx
+'use client'
 
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   const supabase = await createClient();
 
   let storeid = '';
-  if(params.storeid === 'string') {
+  if (params.storeid === 'string') {
     storeid = params.storeid;
   }
 

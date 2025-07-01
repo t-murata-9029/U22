@@ -1,4 +1,4 @@
-// app/store/[storeid]/items/page.tsx
+'use client'
 
 import ItemsManager from '@/components/ItemsManager';
 import { useParams } from 'next/navigation';
@@ -11,7 +11,7 @@ export default async function Page() {
 
   const params = useParams();
   let storeid = '';
-  if(params.storeid === 'string') {
+  if (params.storeid === 'string') {
     storeid = params.storeid;
   }
 
