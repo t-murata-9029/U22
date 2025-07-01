@@ -1,22 +1,23 @@
+'use client'; // 👈 ① 'use client'を追加してクライアントコンポーネントに
+
 import { Suspense } from 'react';
-import EventDashboard from '@/components/EventDashboard'; // 先ほど作成したクライアントコンポーネントをインポート
+import { useParams } from 'next/navigation'; // 👈 ② useParamsをインポート
+import EventDashboard from '@/components/EventDashboard';
 
-// ページのpropsの型
-type DashboardPageProps = {
-    params: {
-        event_id: string;
-    };
-};
 
-// このファイルからは 'use client'; を削除します
-export default async function Page({ params }: DashboardPageProps) {
-    const awaitedParams = await params;
-    const { event_id } = awaitedParams;
+
+export default function Page() { 
+    const params = useParams(); 
+    
+    // useParamsの返り値は string | string[] の可能性があるため、文字列として扱う
+    const event_id = Array.isArray(params.event_id) 
+        ? params.event_id[0] 
+        : params.event_id;
 
     return (
-        // Suspenseは、クライアントコンポーネントの読み込み中にフォールバックUIを表示するために使用します
+        // Suspenseは、EventDashboardの読み込み中や内部でのデータ取得中にフォールバックUIを表示します
         <Suspense fallback={<div style={{ padding: '24px' }}>読み込み中...</div>}>
-            <EventDashboard event_id={event_id} />
+            <EventDashboard event_id={event_id as string} />
         </Suspense>
     );
 }

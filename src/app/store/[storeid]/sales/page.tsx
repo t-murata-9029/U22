@@ -3,16 +3,17 @@
 import SalesHistory from '@/components/SalesHistory';
 
 // このページが受け取るURLパラメータの型を定義
-type SalesPageProps = {
-  params: {
-    storeid: string; // ディレクトリ名 [storeid] と一致
-  };
-};
+import { useParams } from 'next/navigation';
+
 
 // このページはサーバーコンポーネントです
-export default async function Page({ params }: SalesPageProps) {
-  // URLのパスから storeid を取得
-  const { storeid } = params;
+export default async function Page( ){
+const params = useParams();
+  let storeid = '';
+  if(params.storeid === 'string') {
+    storeid = params.storeid;
+  }
+
 
   // 取得した storeid をクライアントコンポーネントにpropsとして渡す
   return (

@@ -1,18 +1,17 @@
-// app/EventTest/[eventid]/create/page.tsx
-
+'use client'
 import EventUploadForm from '@/components/EventUploadForm';
-
-// このページが受け取るURLパラメータの型を定義
-type CreatePageProps = {
-  params: {
-    event_id: string; // ディレクトリ名 [event_id] と一致
-  };
-};
+import { useParams } from 'next/navigation';
 
 // このページはサーバーコンポーネントです
-export default async function Page({ params }: CreatePageProps) {
+export default function Page() {
+
+  const params = useParams()
   // URLのパスから eventid を取得
-  const { event_id } = params;
+  let event_id = ""
+  if (params.event_id === 'string') {
+    event_id = params.event_id;
+  }
+
 
   // 取得した eventid をクライアントコンポーネントにpropsとして渡す
   return (
