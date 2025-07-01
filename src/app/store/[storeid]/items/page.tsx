@@ -1,13 +1,11 @@
 // app/store/[storeid]/items/page.tsx
-
+'use client'
 import ItemsManager from '@/components/ItemsManager';
 import { useParams } from 'next/navigation';
 
 
-
-
 // このページはサーバーコンポーネントです
-export default async function Page() {
+export default function Page() {
   const params = useParams();
   const storeid = params.storeid as string;
 
