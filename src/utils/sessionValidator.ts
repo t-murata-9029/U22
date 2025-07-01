@@ -3,7 +3,6 @@
 /**TODO
  * DBと接続して検証するようにする
  */
-
 import { supabase } from "@/lib/supabase";
 
 /* sessionを検証するファイル */

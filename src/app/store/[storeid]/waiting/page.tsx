@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import WaitingManager from '@/components/WaitingManager';
 
+
 // このページが受け取るURLパラメータの型を定義
 type WaitingPageProps = {
   params: {

@@ -2,20 +2,21 @@
 
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { useParams } from 'next/navigation';
 
-// propsの型定義を storeid に合わせます
-type DashboardPageProps = {
-  params: {
-    storeid: string; // ディレクトリ名 [storeid] に合わせます
-  };
-};
+
+
 
 // ★ ページコンポーネントを async 関数に変更
-export default async function DashboardPage({ params }: DashboardPageProps) {
+export default async function DashboardPage() {
   // paramsから storeid を取り出します
-  const { storeid } = await params;
-
+  const params = useParams();
   const supabase = await createClient();
+
+  let storeid = '';
+  if(params.storeid === 'string') {
+    storeid = params.storeid;
+  }
 
   // ★ URLのstoreidを使って、Supabaseからストア情報を取得
   const { data: store, error } = await supabase
