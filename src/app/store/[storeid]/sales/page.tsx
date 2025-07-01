@@ -3,7 +3,6 @@ import SalesHistory from '@/components/SalesHistory';
 import { useParams } from 'next/navigation';
 
 
-
 export default function Page() {
   const params = useParams();
   const storeid = params.storeid as string;
