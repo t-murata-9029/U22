@@ -1,5 +1,8 @@
+
+
 import { Suspense } from 'react';
 import MapPinEditPage from '@/components/MapPinEditPage';
+import { useParams } from 'next/navigation';
 
 // ページが受け取るsearchParamsの型定義
 type MappinPageProps = {
@@ -10,8 +13,14 @@ type MappinPageProps = {
 };
 
 // ページはサーバーコンポーネントとして定義します
-export default function Page({ searchParams }: MappinPageProps) {
-    const { mapId, imageUrl } = searchParams;
+export default function Page() {
+    const params = useParams();
+    let mapId = "";
+    let imageUrl = "";
+    if (typeof params.mapId === 'string' && typeof params.imageUrl === 'string') {
+        mapId = params.mapId;
+        imageUrl = params.imageUrl;
+    }
 
     // URLに必要な情報がない場合はエラーメッセージを表示
     if (!mapId || !imageUrl) {
