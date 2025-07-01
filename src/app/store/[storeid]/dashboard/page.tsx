@@ -1,7 +1,7 @@
 'use client'
 
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { useParams } from 'next/navigation';
 
 
@@ -11,7 +11,6 @@ import { useParams } from 'next/navigation';
 export default async function DashboardPage() {
   // paramsから storeid を取り出します
   const params = useParams();
-  const supabase = await createClient();
 
   let storeid = '';
   if (params.storeid === 'string') {
