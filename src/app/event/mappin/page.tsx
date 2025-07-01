@@ -4,14 +4,6 @@ import { Suspense } from 'react';
 import MapPinEditPage from '@/components/MapPinEditPage';
 import { useParams } from 'next/navigation';
 
-// ページが受け取るsearchParamsの型定義
-type MappinPageProps = {
-    searchParams: {
-        mapId?: string;
-        imageUrl?: string;
-    };
-};
-
 // ページはサーバーコンポーネントとして定義します
 export default function Page() {
     const params = useParams();
