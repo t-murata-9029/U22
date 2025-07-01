@@ -7,7 +7,6 @@ import { useActionState } from "react";
 export default function LoginForm() {
     const [message, loginAction] = useActionState(
         async (message: string, formData: FormData) => {
-            message; //意味のない一行
             return await login(formData);
         },
         ''

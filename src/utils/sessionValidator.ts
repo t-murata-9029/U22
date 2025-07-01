@@ -4,7 +4,6 @@
  * DBと接続して検証するようにする
  */
 
-import { useRouter } from 'next/navigation';
 import { supabase } from "@/lib/supabase";
 
 /* sessionを検証するファイル */
