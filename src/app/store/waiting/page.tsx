@@ -36,7 +36,7 @@ export default function WaitingPage() {
             });
 
         fetchCallQueues(storeId);
-    }, [storeId]);
+    }, []);
 
     const fetchCallQueues = async (storeId: string) => {
         // 関連テーブルのカラムで直接フィルタリングする
