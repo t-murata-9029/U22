@@ -3,11 +3,11 @@
 import EventUploadForm from '@/components/EventUploadForm';
 
 // このページが受け取るURLパラメータの型を定義
-type CreatePageProps = {
+interface CreatePageProps {
   params: {
-    event_id: string; // ディレクトリ名 [event_id] と一致
+    event_id: string; // paramsは同期的なオブジェクトであるべき
   };
-};
+}
 
 // このページはサーバーコンポーネントです
 export default async function Page({ params }: CreatePageProps) {
