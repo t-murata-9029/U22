@@ -44,11 +44,7 @@ export async function getJoinedEvents(userId: string | undefined): Promise<Event
  * @returns StoreData[]
  */
 export async function getJoinedStores(userId: string | undefined): Promise<StoreData[]> {
-<<<<<<< HEAD
-  const {  } = await supabase
-=======
   const { } = await supabase
->>>>>>> 96ebe9ab5c5fdfdf5e696ea4765bb93456c947a5
     .from('event_user_relation') // 参加者テーブル
     .select(`
         events (
