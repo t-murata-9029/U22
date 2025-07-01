@@ -1,3 +1,5 @@
+'use client'
+
 import { Suspense } from 'react';
 import EventDashboard from '@/components/EventDashboard'; // 先ほど作成したクライアントコンポーネントをインポート
 import { useParams } from 'next/navigation';
