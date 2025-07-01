@@ -12,9 +12,9 @@ type WaitingPageProps = {
 };
 
 // このページはサーバーコンポーネントです
-export default  function Page() {
+export default function Page() {
   // paramsをawaitしてからstoreidを取得
-const { storeid } = useParams<WaitingPageProps['params']>();
+  const { storeid } = useParams<WaitingPageProps['params']>();
 
   // 取得した storeid をクライアントコンポーネントにpropsとして渡す
   return (

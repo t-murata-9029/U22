@@ -1,7 +1,10 @@
-// app/store/[storeid]/dashboard/page.tsx
+'use client'
 
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { useParams } from 'next/navigation';
+
+
 
 // propsの型定義を storeid に合わせます
 type DashboardPageProps = {
@@ -13,10 +16,10 @@ type DashboardPageProps = {
 // ★ ページコンポーネントを async 関数に変更
 export default async function DashboardPage({ params }: DashboardPageProps) {
   // paramsから storeid を取り出します
-
+  const params = useParams();
 
   let storeid = '';
-  if(params.storeid === 'string') {
+  if (params.storeid === 'string') {
     storeid = params.storeid;
   }
 
