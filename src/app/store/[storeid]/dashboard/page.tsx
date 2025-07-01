@@ -3,27 +3,21 @@
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useState, useEffect } from 'react'; // useStateとuseEffectをインポート
+import { useState, useEffect } from 'react';
 
 
-type DashboardPageProps = {
-  params: {
-    storeid: string; // ディレクトリ名 [storeid] に合わせます
-  };
-};
 
 // ページコンポーネントは async 関数にしない
-export default function DashboardPage({ params: initialParams }: DashboardPageProps) {
+export default function DashboardPage() { // initialParams を削除
   // useParams() を使用してクライアントサイドで params を取得
   const routerParams = useParams();
-  const storeid = (routerParams.storeid as string) || ''; // routerParams.storeid が string であることを確認
+  const storeid = (routerParams.storeid as string) || '';
 
-  const [storeName, setStoreName] = useState<string | null>(null); // ストア名を保持するstate
-  const [error, setError] = useState<string | null>(null); // エラーメッセージを保持するstate
-  const [isLoading, setIsLoading] = useState(true); // ロード状態を管理するstate
+  const [storeName, setStoreName] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // storeid が有効な値であることを確認
     if (!storeid) {
       setError('ストアIDが指定されていません。');
       setIsLoading(false);
@@ -50,7 +44,7 @@ export default function DashboardPage({ params: initialParams }: DashboardPagePr
     };
 
     fetchStore();
-  }, [storeid]); // storeid が変更されたら再度フェッチ
+  }, [storeid]);
 
   if (isLoading) {
     return (
