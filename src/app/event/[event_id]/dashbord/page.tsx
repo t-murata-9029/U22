@@ -9,8 +9,8 @@ type DashboardPageProps = {
 };
 
 // このファイルからは 'use client'; を削除します
-export default async function Page({ params }: DashboardPageProps) {
-    const awaitedParams = await params;
+export default function Page({ params }: DashboardPageProps) {
+    const awaitedParams = params;
     const { event_id } = awaitedParams;
 
     return (
