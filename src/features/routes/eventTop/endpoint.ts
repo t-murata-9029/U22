@@ -41,11 +41,11 @@ export async function getEventInfo(eventId: string): Promise<EventData | null> {
 
 /* eventの情報を取得 */
 async function getEvent(eventId: string) {
-    const { data, error } = await supabase.from('event').select('*').eq('id', eventId).single();
+    const { data } = await supabase.from('event').select('*').eq('id', eventId).single();
     return data
 }
 /* storeの情報を取得 */
 async function getStore(eventId: string) {
-    const { data, error } = await supabase.from('store').select('*').eq('event_id', eventId);
+    const { data } = await supabase.from('store').select('*').eq('event_id', eventId);
     return data;
 }

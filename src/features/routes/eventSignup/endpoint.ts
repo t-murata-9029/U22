@@ -8,7 +8,7 @@ export async function signup(formData: FormData) {
     const userid = formData.get('userid')?.toString();
 
     // イベントをインサート
-    const { data, error } = await supabase
+    const { error } = await supabase
         .from('event') // 挿入するテーブル名
         .insert([
             {

@@ -1,18 +1,16 @@
-'use client'; // 👈 ① 'use client'を追加してクライアントコンポーネントに
+'use client'
 
 import { Suspense } from 'react';
-import { useParams } from 'next/navigation'; // 👈 ② useParamsをインポート
-import EventDashboard from '@/components/EventDashboard';
+import EventDashboard from '@/components/EventDashboard'; // 先ほど作成したクライアントコンポーネントをインポート
+import { useParams } from 'next/navigation';
 
-
-
-export default function Page() { 
-    const params = useParams(); 
-    
-    // useParamsの返り値は string | string[] の可能性があるため、文字列として扱う
-    const event_id = Array.isArray(params.event_id) 
-        ? params.event_id[0] 
-        : params.event_id;
+// このファイルからは 'use client'; を削除します
+export default function Page() {
+    const params = useParams();
+    let event_id = "";
+    if (typeof params.event_id === 'string') {
+        event_id = params.event_id;
+    }
 
     return (
         // Suspenseは、EventDashboardの読み込み中や内部でのデータ取得中にフォールバックUIを表示します

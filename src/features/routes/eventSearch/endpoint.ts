@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
  * 　Eventの件数増えたら重くなるから数件ずつ取得とかに仕様変えた方がいい
  */
 export async function getAllEvent(): Promise<EventData[] | null> {
-    const { data, error } = await supabase.from('event').select('*');
+    const { data } = await supabase.from('event').select('*');
 
     if (data == null) {
         return null
