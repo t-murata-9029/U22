@@ -1,12 +1,10 @@
 // app/store/[storeid]/items/page.tsx
-
+'use client'; // このファイルはクライアントコンポーネントです  
 import ItemsManager from '@/components/ItemsManager';
 import { useParams } from 'next/navigation';
 
 
 
-
-// このページはサーバーコンポーネントです
 export default  function Page() {
 
   const params = useParams();
