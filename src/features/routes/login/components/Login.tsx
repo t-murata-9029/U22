@@ -1,8 +1,7 @@
-import { Alert, Box, Button, Divider, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Divider, Link, Paper, Stack, TextField, Typography } from "@mui/material";
 import Form from "next/form";
 import { login } from "@/features/routes/login/endpoint"
 import { useActionState } from "react";
-
 
 export default function LoginForm() {
     const [message, loginAction] = useActionState(
@@ -45,19 +44,11 @@ export default function LoginForm() {
             </Form>
 
             <Divider />
-
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-
-                <Typography variant="caption" sx={{ width: "75%" }}>パスワードを忘れた場合</Typography>
-
-            </Box>
-
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-
-                <Typography variant="caption" sx={{ width: "75%" }}>アカウントを新規作成</Typography>
-
-            </Box>
-
+            <Link href="/user/signup" color="inherit">
+                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                    <Typography variant="caption" sx={{ width: "75%" }}>アカウントを新規作成</Typography>
+                </Box>
+            </Link>
         </Stack >
 
     );
