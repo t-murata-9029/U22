@@ -1,18 +1,11 @@
-// app/store/[storeid]/summary/page.tsx
-
+'use client'
 import SalesSummary from '@/components/SalesSummary';
+import { useParams } from 'next/navigation';
 
-// このページが受け取るURLパラメータの型を定義
-type SummaryPageProps = {
-  params: {
-    storeid: string; // ディレクトリ名 [storeid] と一致
-  };
-};
+export default function Page() {
+  const params = useParams();
 
-// このページはサーバーコンポーネントです
-export default async function Page({ params }: SummaryPageProps) {
-  // URLのパスから storeid を取得
-  const { storeid } = params;
+  const storeid = params.storeid as string; 
 
   // 取得した storeid をクライアントコンポーネントにpropsとして渡す
   return (

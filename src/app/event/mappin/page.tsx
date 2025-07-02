@@ -1,18 +1,18 @@
-import { Suspense } from 'react';
-import { useRouter } from 'next/navigation';
-import MapPinEditPage from '@/components/MapPinEditPage';
+'use client'
 
-// ページが受け取るsearchParamsの型定義
-type MappinPageProps = {
-    searchParams: {
-        mapId?: string;
-        imageUrl?: string;
-    };
-};
+import { Suspense } from 'react';
+import MapPinEditPage from '@/components/MapPinEditPage';
+import { useParams } from 'next/navigation';
 
 // ページはサーバーコンポーネントとして定義します
-export default function Page({ searchParams }: MappinPageProps) {
-    const { mapId, imageUrl } = searchParams;
+export default function Page() {
+    const params = useParams();
+    let mapId = "";
+    let imageUrl = "";
+    if (typeof params.mapId === 'string' && typeof params.imageUrl === 'string') {
+        mapId = params.mapId;
+        imageUrl = params.imageUrl;
+    }
 
     // URLに必要な情報がない場合はエラーメッセージを表示
     if (!mapId || !imageUrl) {
@@ -23,15 +23,15 @@ export default function Page({ searchParams }: MappinPageProps) {
             </main>
         );
     }
-    
+
     // クライアントコンポーネントをSuspenseで囲みます
     return (
         <main className="p-4 md:p-6">
-             <h1 className="text-2xl font-bold mb-4">ピン編集</h1>
+            <h1 className="text-2xl font-bold mb-4">ピン編集</h1>
             <Suspense fallback={<div className="p-8 text-center animate-pulse">編集画面を読み込み中...</div>}>
-                <MapPinEditPage 
-                    mapId={mapId} 
-                    imageUrl={decodeURIComponent(imageUrl)} 
+                <MapPinEditPage
+                    mapId={mapId}
+                    imageUrl={decodeURIComponent(imageUrl)}
                 />
             </Suspense>
         </main>

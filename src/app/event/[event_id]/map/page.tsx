@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import MapTabs from '@/components/MapTabs';
 import MapContainer from '@/components/MapContainer';
 
@@ -13,19 +13,13 @@ export type MapInfo = {
     publicUrl: string; // 表示用の公開URL
 };
 
-// ページが受け取るpropsの型定義
-type EventMapPageProps = {
-    params: {
-        event_id: string; // URLの [event_id] 部分がここに入ります
-    };
-};
-
-export default function Page({ params }: EventMapPageProps) {
+export default function Page() {
     const [maps, setMaps] = useState<MapInfo[]>([]);
     const [activeTab, setActiveTab] = useState(0);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const { event_id } = params;
+    const { event_id } = useParams();
+
 
     // event_id を元に、関連する地図のリストを取得します
     useEffect(() => {
@@ -81,14 +75,14 @@ export default function Page({ params }: EventMapPageProps) {
             >
                 イベント一覧に戻る
             </button>
-            
+
             {/* タブ表示コンポーネントを呼び出し */}
             <MapTabs
                 maps={maps}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
             />
-            
+
             {/* 地図とピンの管理コンポーネントを呼び出し */}
             {activeMap && (
                 <MapContainer

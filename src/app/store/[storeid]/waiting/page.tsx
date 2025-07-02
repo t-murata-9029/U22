@@ -1,6 +1,8 @@
 // app/store/[storeid]/waiting/page.tsx
-
+'use client';
+import { useParams } from 'next/navigation';
 import WaitingManager from '@/components/WaitingManager';
+
 
 // このページが受け取るURLパラメータの型を定義
 type WaitingPageProps = {
@@ -10,9 +12,9 @@ type WaitingPageProps = {
 };
 
 // このページはサーバーコンポーネントです
-export default async function Page({ params }: WaitingPageProps) {
-  // URLのパスから storeid を取得
-  const { storeid } = params;
+export default function Page() {
+  // paramsをawaitしてからstoreidを取得
+  const { storeid } = useParams<WaitingPageProps['params']>();
 
   // 取得した storeid をクライアントコンポーネントにpropsとして渡す
   return (

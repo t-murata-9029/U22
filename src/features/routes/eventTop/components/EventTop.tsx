@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Card, CardActionArea, CardContent, CardMedia, CircularProgress, Link, Paper, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardMedia, CircularProgress, Link, Paper, Typography } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { existEvent, getEventInfo } from '../endpoint';
@@ -8,7 +8,7 @@ import { EventData } from '@/interfases/event';
 import React from 'react';
 
 /* イベントのトップ画面 */
-export default function () {
+export default function EventTop() {
     const [event, setEvent] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [eventInfo, setEventInfo] = useState<EventData | null>(null)

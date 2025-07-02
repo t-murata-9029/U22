@@ -1,19 +1,13 @@
 // app/store/[storeid]/items/page.tsx
-
+'use client'
 import ItemsManager from '@/components/ItemsManager';
+import { useParams } from 'next/navigation';
 
-
-// このページが受け取るURLパラメータの型を定義
-type ItemsPageProps = {
-  params: {
-    storeid: string; // ディレクトリ名 [storeid] と一致
-  };
-};
 
 // このページはサーバーコンポーネントです
-export default async function Page({ params }: ItemsPageProps) {
-  // URLのパスから storeid を取得
-  const { storeid } = params;
+export default function Page() {
+  const params = useParams();
+  const storeid = params.storeid as string;
 
   // 取得した storeid をクライアントコンポーネントにpropsとして渡す
   return (

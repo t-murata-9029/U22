@@ -2,6 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { EventData } from "@/interfases/event";
+import { StoreData } from "@/interfases/store";
 
 /* イベントのIDからイベントが存在するかチェックする */
 export async function existEvent(eventId: string): Promise<boolean> {
@@ -24,7 +25,7 @@ export async function getEventInfo(eventId: string): Promise<EventData | null> {
             name: event.name || "",
             owner_id: event.owner_id || "",
             description: event.description || "",
-            store_list: store != null ? store.map((record: any) => ({
+            store_list: store != null ? store.map((record: StoreData) => ({
                 id: record.id,
                 name: record.name,
                 image: record.image || '',
@@ -40,11 +41,11 @@ export async function getEventInfo(eventId: string): Promise<EventData | null> {
 
 /* eventの情報を取得 */
 async function getEvent(eventId: string) {
-    const { data, error } = await supabase.from('event').select('*').eq('id', eventId).single();
+    const { data } = await supabase.from('event').select('*').eq('id', eventId).single();
     return data
 }
 /* storeの情報を取得 */
 async function getStore(eventId: string) {
-    const { data, error } = await supabase.from('store').select('*').eq('event_id', eventId);
+    const { data } = await supabase.from('store').select('*').eq('event_id', eventId);
     return data;
 }

@@ -46,7 +46,7 @@ export default function EventSearch() {
             {
                 eventList?.map(record => {
                     // 検索文字列含んでたら返す
-                    if (record.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    if (record.name?.toLowerCase().includes(searchTerm.toLowerCase())) {
                         return (
                             <React.Fragment key={record.id}>
                                 <Link href={`/event/${record.id}`}>

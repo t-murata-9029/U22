@@ -2,7 +2,7 @@
 
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Form from 'next/form'
-import { signup } from '../endpoint'
+import { signup } from '../endpoints'
 
 export default function Signup() {
     return (
