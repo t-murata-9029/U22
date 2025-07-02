@@ -16,12 +16,13 @@ export default function WaitingPage() {
     // QRコード読み取り用
     const [scanning, setScanning] = useState(false);
 
-    // カスみたいなコード将来消すべき
-    setStoreId("");
-    console.log(inputUserId);
+    
 
     // 商品一覧の取得
     useEffect(() => {
+        // カスみたいなコード将来消すべき
+        setStoreId("");
+        console.log(inputUserId);
         if (!storeId) return;
         supabase
             .from('item')
@@ -36,7 +37,7 @@ export default function WaitingPage() {
             });
 
         fetchCallQueues(storeId);
-    }, [storeId]);
+    }, []);
 
     const fetchCallQueues = async (storeId: string) => {
         // 関連テーブルのカラムで直接フィルタリングする
