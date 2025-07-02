@@ -98,6 +98,7 @@ export default function UserHome() {
             <br />
             <Link href="/event/signup">イベント作成はこちら！</Link>
             <br />
+            console.log(eventList);
             {eventList?.length != 0 ?
                 <Box sx={{ my: 1 }}>
                     <Typography>あなたが所属しているイベント</Typography>
