@@ -59,7 +59,7 @@ export default function UserHome() {
                     setUserId(JSON.stringify(data.session?.user.id));
                     setMail(JSON.stringify(data.session?.user.email))
                     setEventList(await getJoinedEvents(data.session?.user.id))
-                    console.log(eventList)
+
                 }
             } catch (error) {
                 console.error("Error validating session:", error);
