@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
  */
 export async function getJoinedEvents(userId: string | undefined): Promise<EventData[]> {
   const { data } = await supabase
-    .from('event') // 参加者テーブル
+    .from('event_user_reration') // 参加者テーブル
     .select(`
         events (
           id,
