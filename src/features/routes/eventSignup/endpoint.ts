@@ -32,7 +32,7 @@ export async function signup(formData: FormData) {
         .insert([
             {
                 event_id: eventData[0].id,
-                user_id: userid
+                user_id: userid,
             },
         ]);
 

@@ -23,6 +23,8 @@ export async function getJoinedEvents(userId: string | undefined): Promise<Event
 
   // 所属してなかった場合
   if (data == null) {
+    console.log("なかみないよ")
+    console.log(data)
     return [];
   }
 
