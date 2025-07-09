@@ -11,7 +11,7 @@ export async function getJoinedEvents(userId: string | undefined): Promise<Event
   const { data } = await supabase
     .from('event_user_relation') // 参加者テーブル
     .select(`
-        events (
+        event (
           id,
           name,
           email,
@@ -26,16 +26,9 @@ export async function getJoinedEvents(userId: string | undefined): Promise<Event
     return [];
   }
 
-  const eventList: EventData[] = data.flatMap((record) =>
-    record.events.map((eventItem: EventData) => ({
-      id: eventItem.id || "",
-      name: eventItem.name || "",
-      owner_id: eventItem.owner_id || "",
-      description: eventItem.description || "",
-      store_list: [],
-    }))
-  );
-  return eventList;
+  const allEvents: EventData[] = data.flatMap(record => record.event);
+
+  return allEvents;
 }
 
 /**

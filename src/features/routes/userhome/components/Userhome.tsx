@@ -98,6 +98,15 @@ export default function UserHome() {
             <br />
             <Link href="/event/signup">イベント作成はこちら！</Link>
             <br />
+            <Link href="">
+                <Typography>購入履歴</Typography>
+            </Link>
+            <Link href="">
+                <Typography>最近利用したイベント</Typography>
+            </Link>
+            <Link href="">
+                <Typography>利用したイベントのオススメ</Typography>
+            </Link>
             {eventList?.length != 0 ?
                 <Box sx={{ my: 1 }}>
                     <Typography>あなたが所属しているイベント</Typography>
@@ -117,10 +126,6 @@ export default function UserHome() {
                 </Box>
                 : ""
             }
-            <Typography>待ちのやつ</Typography>
-            <Typography>購入履歴</Typography>
-            <Typography>最近利用したイベント</Typography>
-            <Typography>利用したイベントのオススメ</Typography>
         </Box>
     ) :
         blockpage;

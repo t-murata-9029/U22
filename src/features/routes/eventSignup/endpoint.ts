@@ -8,7 +8,7 @@ export async function signup(formData: FormData) {
     const userid = formData.get('userid')?.toString();
 
     // イベントをインサート
-    const { error } = await supabase
+    const { data: eventInfo, error } = await supabase
         .from('event') // 挿入するテーブル名
         .insert([
             {
@@ -17,8 +17,17 @@ export async function signup(formData: FormData) {
                 owner_id: userid,
                 email: "",
             },
-        ]);
-
+        ])
+        .select();
+    if (eventInfo == null) {
+        return;
+    }
+    const { } = await supabase.from('event_user_relation').insert([
+        {
+            event_id: eventInfo[0].id,
+            user_id: userid
+        }
+    ])
     if (error) {
         throw error;
     }
