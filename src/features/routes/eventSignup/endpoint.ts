@@ -19,9 +19,11 @@ export async function signup(formData: FormData) {
             },
         ])
         .select();
-    if (eventInfo == null) {
+
+    if (!eventInfo || eventInfo.length === 0) {
         return;
     }
+
     const { } = await supabase.from('event_user_relation').insert([
         {
             event_id: eventInfo[0].id,
