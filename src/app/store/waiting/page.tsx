@@ -16,7 +16,7 @@ export default function WaitingPage() {
     // QRコード読み取り用
     const [scanning, setScanning] = useState(false);
 
-    
+
 
     // 商品一覧の取得
     useEffect(() => {
@@ -82,7 +82,7 @@ export default function WaitingPage() {
         if (!storeId || !userId) return;
 
         const total = items.reduce((sum, item) => {
-            return sum + (selectedItems[item.id] || 0) * item.price;
+            return sum + (selectedItems[item.id] || 0) * (item.price ?? 0);
         }, 0);
 
         const { data: transaction, error: transError } = await supabase
